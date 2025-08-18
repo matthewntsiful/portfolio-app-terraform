@@ -14,3 +14,31 @@ _book
 *.epub
 *.mobi
 *.pdf
+
+# Terraform files
+.terraform/
+*.tfstate
+*.tfstate.*
+.terraform.lock.hcl
+.terraform.tfstate.lock.info
+.terraform.lock.hcl
+*.tfvars
+*.tfvars.json
+.terraform.lock.hcl
+
+# Crash log files
+crash.log
+crash.*.log
+
+# Exclude all .tfstate files, ignore crash.log and override files as they are usually used for local development
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
+
+# Ignore CLI configuration files
+.terraformrc
+terraform.rc
+
+# Ignore .terraform directory in all subdirectories
+**/.terraform/*
