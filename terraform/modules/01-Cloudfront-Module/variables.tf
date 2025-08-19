@@ -1,16 +1,11 @@
 # =============================================================================
-# COMMON VARIABLES FOR ALL MODULES
+# CLOUDFRONT MODULE VARIABLES.TF
 # =============================================================================
 
-# Domain Configuration
 variable "domain_name" {
   description = "The domain name for the website"
   type        = string
 }
-
-# =============================================================================
-# CLOUDFRONT MODULE VARIABLES
-# =============================================================================
 
 variable "s3_bucket_regional_domain" {
   description = "Regional domain name of the S3 bucket"
@@ -32,4 +27,10 @@ variable "enable_logging" {
   description = "Enable CloudFront logging"
   type        = bool
   default     = false
+}
+
+variable "cloudfront_price_class" {
+  description = "CloudFront distribution price class"
+  type        = string
+  default     = "PriceClass_100"
 }

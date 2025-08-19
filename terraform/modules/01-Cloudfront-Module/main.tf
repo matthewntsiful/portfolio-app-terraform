@@ -51,7 +51,7 @@ resource "aws_s3_bucket_lifecycle_configuration" "logs" {
   rule {
     id     = "log-expiration"
     status = "Enabled"
-    
+
     # Required filter
     filter {
       prefix = ""
