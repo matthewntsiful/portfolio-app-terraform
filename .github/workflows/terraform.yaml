@@ -35,9 +35,9 @@ permissions:
 
 env:
   AWS_REGION: "us-east-1"
-  TF_STATE_BUCKET: "your-terraform-state-bucket"
+  TF_STATE_BUCKET: "resume-app-backend-180825"
   TF_WORKING_DIR: "./terraform/infra"
-  ENVIRONMENT: "prod"
+  ENVIRONMENT: "production"
 
 jobs:
   plan:
@@ -50,7 +50,7 @@ jobs:
     
     steps:
     - name: Checkout
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
 
     - name: Configure AWS Credentials
       uses: aws-actions/configure-aws-credentials@v4
@@ -114,7 +114,7 @@ jobs:
       run: exit 1
 
     - name: Checkout
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
 
     - name: Download Plan Artifact
       uses: actions/download-artifact@v4
@@ -210,4 +210,4 @@ jobs:
         SLACK_ICON: https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png
         SLACK_FOOTER: "${{ github.workflow }} #${{ github.run_number }}"
         SLACK_TS: ${{ github.run_attempt }}
-        ###
+        
