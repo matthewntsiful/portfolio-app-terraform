@@ -1,56 +1,70 @@
-#Variables for Infrastructure
+# =============================================================================
+# COMMON VARIABLES FOR ALL MODULES
+# =============================================================================
 
-#Variables for S3
-variable "environment" {
-  description = "Environment for the S3 Bucket"
-  type        = string
-  default     = "production"
-  validation {
-    condition     = contains(["development", "staging", "production"], var.environment)
-    error_message = "Environment must be development, staging or production"
-  }
-}
-
+# Domain Configuration
 variable "domain_name" {
-  description = "Domain Name for the resume website"
+  description = "The domain name for the website"
   type        = string
-
-  validation {
-    condition     = can(regex("^([a-zA-Z0-9][a-zA-Z0-9-]{0,61}[a-zA-Z0-9]\\.){1,}[a-zA-Z]{2,}$", var.domain_name))
-    error_message = "Domain name must be a valid domain name"
-  }
 }
 
-variable "enable_logging" {
-  description = "Enable cloudFront access logging"
-  type        = bool
-  default     = true
-
-}
-
-variable "price_class" {
-  description = "CloudFront price class"
+variable "environment" {
+  description = "The environment for the website"
   type        = string
-  default     = "PriceClass_100"
-  validation {
-    condition     = contains(["PriceClass_All", "PriceClass_200", "PriceClass_100"], var.price_class)
-    error_message = "Price class must be PriceClass_All, PriceClass_200, PriceClass_100."
-  }
-
 }
+
+# =============================================================================
+# S3 MODULE VARIABLES
+# =============================================================================
+
 variable "lifecycle_enabled" {
-  description = "Enable lifecycle management"
+  description = "Enable S3 bucket lifecycle configuration"
   type        = bool
   default     = true
 }
 
-variable "enable_health_check" {
-  description = "Enable health check"
-  type        = bool
-  default     = true
+# =============================================================================
+# CLOUDFRONT MODULE VARIABLES
+# =============================================================================
+
+variable "s3_bucket_regional_domain" {
+  description = "Regional domain name of the S3 bucket"
+  type        = string
 }
 
 variable "origin_access_control_id" {
-  description = "Origin Access Control ID"
+  description = "ID of the Origin Access Control"
   type        = string
+}
+
+variable "waf_web_acl_arn" {
+  description = "ARN of the WAF Web ACL"
+  type        = string
+  default     = null
+}
+
+variable "enable_logging" {
+  description = "Enable CloudFront logging"
+  type        = bool
+  default     = false
+}
+
+# =============================================================================
+# ROUTE53 MODULE VARIABLES  
+# =============================================================================
+
+variable "cloudfront_distribution_domain" {
+  description = "Domain name of the CloudFront distribution"
+  type        = string
+}
+
+variable "cloudfront_distribution_zone" {
+  description = "Hosted zone ID of the CloudFront distribution"
+  type        = string
+}
+
+variable "enable_health_check" {
+  description = "Enable Route53 health checks"
+  type        = bool
+  default     = false
 }
