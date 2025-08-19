@@ -1,6 +1,7 @@
 # =============================================================================
-# MAIN MODULE INTEGRATION 
+# ROOT MODULE MAIN.TF - MODULE INTEGRATION
 # =============================================================================
+
 
 # S3 Module
 module "s3" {
@@ -26,6 +27,7 @@ module "cloudfront" {
   origin_access_control_id  = module.s3.origin_access_control_id
   waf_web_acl_arn           = module.waf.waf_acl_arn
   enable_logging            = var.enable_logging
+
 }
 
 # Route53 Module

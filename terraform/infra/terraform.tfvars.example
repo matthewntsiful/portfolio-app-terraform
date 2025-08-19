@@ -1,0 +1,55 @@
+# =============================================================================
+# TERRAFORM.TFVARS.EXAMPLE - TEMPLATE FOR CONFIGURATION
+# =============================================================================
+# Copy this file to terraform.tfvars and update with your actual values
+
+# REQUIRED: Your domain name (without www)
+domain_name = "example.com"
+
+# OPTIONAL: Feature toggles (defaults shown)
+lifecycle_enabled    = true   # Enable S3 lifecycle management
+enable_logging      = false  # Enable CloudFront logging (additional S3 costs)
+enable_health_check = true   # Enable Route53 health monitoring
+
+# OPTIONAL: Additional configuration
+# aws_region = "us-east-1"     # AWS region (if not set via AWS_DEFAULT_REGION)
+# environment = "production"    # Environment tag
+
+# =============================================================================
+# COST OPTIMIZATION SETTINGS
+# =============================================================================
+
+# CloudFront price class options:
+# - "PriceClass_All" (default) - All edge locations (highest cost, best performance)
+# - "PriceClass_200" - North America, Europe, Asia, Middle East, and Africa
+# - "PriceClass_100" - North America and Europe only (lowest cost)
+# cloudfront_price_class = "PriceClass_100"
+
+# S3 lifecycle settings
+# lifecycle_enabled = true     # Automatically transition old versions to cheaper storage
+
+# =============================================================================
+# MONITORING AND LOGGING SETTINGS  
+# =============================================================================
+
+# CloudFront logging (creates additional S3 bucket and costs)
+# enable_logging = false
+
+# Route53 health checks (small monthly fee per health check)
+# enable_health_check = true
+
+# =============================================================================
+# EXAMPLE VALUES FOR DIFFERENT ENVIRONMENTS
+# =============================================================================
+
+# Production example:
+# domain_name = "myresume.com"
+# lifecycle_enabled = true
+# enable_logging = true
+# enable_health_check = true
+
+# Development/Testing example:
+# domain_name = "dev-myresume.com" 
+# lifecycle_enabled = false
+# enable_logging = false
+# enable_health_check = false
