@@ -40,7 +40,7 @@ resource "aws_acm_certificate" "main" {
 # Certificate validation - wait for DNS validation to complete
 resource "aws_acm_certificate_validation" "main" {
   provider = aws.us_east_1
-  
+
   certificate_arn         = aws_acm_certificate.main.arn
   validation_record_fqdns = [for record in aws_route53_record.cert_validation : record.fqdn]
 
@@ -84,7 +84,7 @@ resource "aws_s3_bucket_lifecycle_configuration" "logs" {
   rule {
     id     = "log-expiration"
     status = "Enabled"
-    
+
     # Required filter
     filter {
       prefix = ""
