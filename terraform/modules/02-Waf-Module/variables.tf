@@ -1,4 +1,6 @@
-#Variables for WAF Module
+# =============================================================================
+# WAF MODULE VARIABLES
+# =============================================================================
 
 variable "environment" {
   description = "Environment for the WAF"
@@ -22,4 +24,3 @@ variable "blocked_countries" {
   type        = list(string)
   default     = []
 }
-

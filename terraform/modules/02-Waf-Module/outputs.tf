@@ -1,15 +1,18 @@
-#Outputs for WAF Module
+# =============================================================================
+# WAF MODULE OUTPUTS 
+# =============================================================================
+
 output "waf_acl_id" {
   description = "ID of the WAF ACL"
-  value       = module.wafv2_acl.waf_acl_id
+  value       = aws_wafv2_web_acl.main.id
 }
 
 output "waf_acl_arn" {
   description = "ARN of the WAF ACL"
-  value       = module.wafv2_acl.waf_acl_arn
+  value       = aws_wafv2_web_acl.main.arn
 }
 
-output "web_acl_capacity" {
-  description = "Capacity units consumed by the Web ACL"
-  value       = aws_wafv2_web_acl.main.capacity
+output "waf_acl_name" {
+  description = "Name of the WAF ACL"
+  value       = aws_wafv2_web_acl.main.name
 }
