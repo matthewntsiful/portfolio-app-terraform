@@ -1,17 +1,11 @@
 # =============================================================================
-# COMMON VARIABLES FOR ALL MODULES
+# ROUTE53 MODULE VARIABLES.TF
 # =============================================================================
 
-# Domain Configuration
 variable "domain_name" {
   description = "The domain name for the website"
   type        = string
 }
-
-
-# =============================================================================
-# ROUTE53 MODULE VARIABLES  
-# =============================================================================
 
 variable "cloudfront_distribution_domain" {
   description = "Domain name of the CloudFront distribution"

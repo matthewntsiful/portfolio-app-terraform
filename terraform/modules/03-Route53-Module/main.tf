@@ -81,14 +81,14 @@ resource "aws_route53_record" "www_ipv6" {
 
 # Health Check for Website Monitoring - FIXED insufficient_data_health_status
 resource "aws_route53_health_check" "main" {
-  count                            = var.enable_health_check ? 1 : 0
-  fqdn                             = var.domain_name
-  port                             = 443
-  type                             = "HTTPS"
-  resource_path                    = "/"
-  failure_threshold                = 3
-  request_interval                 = 30
-  insufficient_data_health_status  = "LastKnownStatus"  # FIXED: was "Failure"
+  count                           = var.enable_health_check ? 1 : 0
+  fqdn                            = var.domain_name
+  port                            = 443
+  type                            = "HTTPS"
+  resource_path                   = "/"
+  failure_threshold               = 3
+  request_interval                = 30
+  insufficient_data_health_status = "LastKnownStatus" # FIXED: was "Failure"
 
   tags = merge(local.common_tags, {
     Name = format("%s-%s-health-check", local.name_prefix, local.suffix)
@@ -121,7 +121,7 @@ resource "aws_cloudwatch_metric_alarm" "health_check" {
 # SNS topic for Health check Alerts
 resource "aws_sns_topic" "alert" {
   count = var.enable_health_check ? 1 : 0
-  name  = "${var.domain_name}-health-alert"
+  name  = "${local.name_prefix}-health-alert"
 
   tags = merge(local.common_tags, {
     Name = format("%s-health-alerts", local.name_prefix)
