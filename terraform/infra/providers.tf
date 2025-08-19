@@ -30,7 +30,7 @@ provider "aws" {
       Owner       = "Matthew Ntsiful"
       Managed     = "Terraform"
       CreatedDate = formatdate("YYYY-MM-DD", timestamp())
-  }, var.additional_tags)
+    }, var.additional_tags)
   }
 }
 
