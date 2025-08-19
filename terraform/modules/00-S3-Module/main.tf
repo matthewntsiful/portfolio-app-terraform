@@ -92,7 +92,7 @@ resource "aws_s3_bucket_policy" "webapp_bucket" {
 
 data "aws_caller_identity" "current" {}
 
-# Lifecycle configuration for cost optimization - FIXED WITH FILTER
+# Lifecycle configuration for cost optimization - FIXED NONCURRENT_DAYS
 resource "aws_s3_bucket_lifecycle_configuration" "webapp_bucket" {
   count  = var.lifecycle_enabled ? 1 : 0
   bucket = aws_s3_bucket.webapp_bucket.id
@@ -100,7 +100,7 @@ resource "aws_s3_bucket_lifecycle_configuration" "webapp_bucket" {
   rule {
     id     = "website_lifecycle"
     status = "Enabled"
-
+    
     # Required filter - apply to all objects
     filter {
       prefix = ""
@@ -111,25 +111,17 @@ resource "aws_s3_bucket_lifecycle_configuration" "webapp_bucket" {
     }
 
     noncurrent_version_expiration {
-      noncurrent_days = 30
+      noncurrent_days = 90  # Delete old versions after 90 days
     }
 
     noncurrent_version_transition {
-      noncurrent_days = 7
+      noncurrent_days = 30  # FIXED: Must be >= 30 for STANDARD_IA
       storage_class   = "STANDARD_IA"
     }
-  }
-}
 
-# CORS Configuration for S3 Modern Web Practices
-resource "aws_s3_bucket_cors_configuration" "webapp_bucket" {
-  bucket = aws_s3_bucket.webapp_bucket.id
-
-  cors_rule {
-    allowed_headers = ["*"]
-    allowed_methods = ["GET", "HEAD"]
-    allowed_origins = ["https://${var.domain_name}", "https://www.${var.domain_name}"]
-    expose_headers  = ["ETag"]
-    max_age_seconds = 3000
+    noncurrent_version_transition {
+      noncurrent_days = 60  # Move to Glacier after 60 days
+      storage_class   = "GLACIER"
+    }
   }
 }
