@@ -97,7 +97,7 @@ jobs:
       if: always() && steps.plan.outcome == 'success' && (github.event_name != 'workflow_dispatch' || github.event.inputs.action == 'plan' || github.event.inputs.action == 'apply')
       with:
         name: tfplan
-        path: ${{ env.TF_WORKING_DIR }}/tfplan.txt
+        path: ${{ env.TF_WORKING_DIR }}/tfplan
 
   apply:
     name: 'Terraform Apply'
