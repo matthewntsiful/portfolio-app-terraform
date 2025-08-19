@@ -34,3 +34,8 @@ variable "cloudfront_price_class" {
   type        = string
   default     = "PriceClass_100"
 }
+
+variable "hosted_zone_id" {
+  description = "Route53 hosted zone ID for certificate validation"
+  type        = string
+}

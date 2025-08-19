@@ -19,8 +19,11 @@ locals {
   }
 }
 
-# SSL Certificate
+# SSL Certificate - MUST be in us-east-1 for CloudFront
 resource "aws_acm_certificate" "main" {
+  # Force certificate to be created in us-east-1
+  provider = aws.us_east_1
+
   domain_name               = var.domain_name
   subject_alternative_names = ["www.${var.domain_name}"]
   validation_method         = "DNS"
@@ -32,6 +35,36 @@ resource "aws_acm_certificate" "main" {
   tags = merge(local.common_tags, {
     Name = format("%s-certificate", local.name_prefix)
   })
+}
+
+# Certificate validation - wait for DNS validation to complete
+resource "aws_acm_certificate_validation" "main" {
+  provider = aws.us_east_1
+  
+  certificate_arn         = aws_acm_certificate.main.arn
+  validation_record_fqdns = [for record in aws_route53_record.cert_validation : record.fqdn]
+
+  timeouts {
+    create = "10m"
+  }
+}
+
+# DNS validation records
+resource "aws_route53_record" "cert_validation" {
+  for_each = {
+    for dvo in aws_acm_certificate.main.domain_validation_options : dvo.domain_name => {
+      name   = dvo.resource_record_name
+      record = dvo.resource_record_value
+      type   = dvo.resource_record_type
+    }
+  }
+
+  allow_overwrite = true
+  name            = each.value.name
+  records         = [each.value.record]
+  ttl             = 60
+  type            = each.value.type
+  zone_id         = var.hosted_zone_id
 }
 
 # S3 Bucket for Logging (create first if needed)
@@ -51,7 +84,7 @@ resource "aws_s3_bucket_lifecycle_configuration" "logs" {
   rule {
     id     = "log-expiration"
     status = "Enabled"
-
+    
     # Required filter
     filter {
       prefix = ""
@@ -73,8 +106,11 @@ resource "aws_s3_bucket_lifecycle_configuration" "logs" {
   }
 }
 
-# CloudFront Distribution
+# CloudFront Distribution - FIXED: Now depends on certificate validation
 resource "aws_cloudfront_distribution" "main" {
+  # Explicitly depend on certificate validation
+  depends_on = [aws_acm_certificate_validation.main]
+
   origin {
     domain_name              = var.s3_bucket_regional_domain
     origin_id                = "S3-${var.domain_name}"
@@ -118,7 +154,7 @@ resource "aws_cloudfront_distribution" "main" {
     max_ttl     = 31536000 # 1 year
   }
 
-  price_class = "PriceClass_100"
+  price_class = var.cloudfront_price_class
 
   restrictions {
     geo_restriction {
@@ -127,7 +163,8 @@ resource "aws_cloudfront_distribution" "main" {
   }
 
   viewer_certificate {
-    acm_certificate_arn      = aws_acm_certificate.main.arn
+    # Use the validated certificate
+    acm_certificate_arn      = aws_acm_certificate_validation.main.certificate_arn
     ssl_support_method       = "sni-only"
     minimum_protocol_version = "TLSv1.2_2021"
   }
