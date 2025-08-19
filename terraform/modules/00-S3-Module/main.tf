@@ -100,7 +100,7 @@ resource "aws_s3_bucket_lifecycle_configuration" "webapp_bucket" {
   rule {
     id     = "website_lifecycle"
     status = "Enabled"
-    
+
     # Required filter - apply to all objects
     filter {
       prefix = ""
