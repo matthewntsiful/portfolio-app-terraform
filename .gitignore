@@ -22,7 +22,7 @@ _book
 .terraform.lock.hcl
 .terraform.tfstate.lock.info
 .terraform.lock.hcl
-*.tfvars
+#*.tfvars
 *.tfvars.json
 .terraform.lock.hcl
 
