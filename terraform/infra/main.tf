@@ -28,7 +28,7 @@ module "waf" {
  
 # CloudFront Module - Create after Route53 (needs hosted zone for cert validation)
 module "cloudfront" {
-  source = "../modules/01-CloudFront-Module"
+  source = "../modules/01-Cloudfront-Module"
   
   domain_name                   = var.domain_name
   s3_bucket_regional_domain    = module.s3.bucket_regional_domain_name
