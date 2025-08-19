@@ -5,18 +5,18 @@
 # S3 Module - Create first
 module "s3" {
   source = "../modules/00-S3-Module"
-  
+
   domain_name       = var.domain_name
   lifecycle_enabled = var.lifecycle_enabled
 }
 
 # Route53 Module - Create second (needed for certificate validation)
 module "route53" {
-  source = "../modules/03-Route53-Module"
-  domain_name         = var.domain_name
+  source                         = "../modules/03-Route53-Module"
+  domain_name                    = var.domain_name
   cloudfront_distribution_domain = module.cloudfront.distribution_domain_name
   cloudfront_distribution_zone   = module.cloudfront.distribution_hosted_zone_id
-  enable_health_check = false  # Will enable after CloudFront is created
+  enable_health_check            = false # Will enable after CloudFront is created
 }
 
 # WAF Module - Create third
@@ -25,27 +25,30 @@ module "waf" {
 
   environment = var.environment
 }
- 
+
 # CloudFront Module - Create after Route53 (needs hosted zone for cert validation)
 module "cloudfront" {
   source = "../modules/01-Cloudfront-Module"
-  
-  domain_name                   = var.domain_name
-  s3_bucket_regional_domain    = module.s3.bucket_regional_domain_name
-  origin_access_control_id     = module.s3.origin_access_control_id
-  waf_web_acl_arn             = module.waf.waf_acl_arn
-  enable_logging              = var.enable_logging
-  cloudfront_price_class      = var.cloudfront_price_class
-  hosted_zone_id              = module.route53.hosted_zone_id
+  providers = {
+    aws.us_east_1 = aws.us_east_1
+
+  }
+  domain_name               = var.domain_name
+  s3_bucket_regional_domain = module.s3.bucket_regional_domain_name
+  origin_access_control_id  = module.s3.origin_access_control_id
+  waf_web_acl_arn           = module.waf.waf_acl_arn
+  enable_logging            = var.enable_logging
+  cloudfront_price_class    = var.cloudfront_price_class
+  hosted_zone_id            = module.route53.hosted_zone_id
 }
 
 # Route53 Records - Create after CloudFront
 module "route53_records" {
   source = "../modules/04-Route53-Records-Module"
-  
+
   domain_name                    = var.domain_name
-  hosted_zone_id                = module.route53.hosted_zone_id
+  hosted_zone_id                 = module.route53.hosted_zone_id
   cloudfront_distribution_domain = module.cloudfront.distribution_domain_name
   cloudfront_distribution_zone   = module.cloudfront.distribution_hosted_zone_id
-  enable_health_check           = var.enable_health_check
+  enable_health_check            = var.enable_health_check
 }

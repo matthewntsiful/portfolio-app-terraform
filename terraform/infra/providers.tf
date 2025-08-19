@@ -10,7 +10,6 @@ terraform {
       version = "~> 6.7"
     }
   }
-
   backend "s3" {
     bucket       = "resume-app-backend-180825"
     key          = "infra/terraform.tfstate"
@@ -23,7 +22,7 @@ terraform {
 # Default AWS Provider
 provider "aws" {
   region = var.aws_region
-  
+
   default_tags {
     tags = merge({
       Project     = "Resume App"
@@ -39,7 +38,7 @@ provider "aws" {
 provider "aws" {
   alias  = "us_east_1"
   region = "us-east-1"
-  
+
   default_tags {
     tags = merge({
       Project     = "Resume App"
