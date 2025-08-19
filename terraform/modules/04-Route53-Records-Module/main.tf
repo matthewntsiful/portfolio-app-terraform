@@ -111,7 +111,7 @@ resource "aws_cloudwatch_metric_alarm" "health_check" {
 # SNS topic for Health check Alerts
 resource "aws_sns_topic" "alert" {
   count = var.enable_health_check ? 1 : 0
-  name  = "${var.domain_name}-health-alert"
+  name  = format("%s-health-alert", local.name_prefix)
 
   tags = merge(local.common_tags, {
     Name = format("%s-health-alerts", local.name_prefix)
