@@ -1,10 +1,12 @@
-#Locals for S3 Module
+# =============================================================================
+# S3 MODULE - RESOURCE DEFINITION
+# =============================================================================
+
 locals {
   name_prefix   = "resume-webapp"
   suffix        = "storage"
   date          = "180825"
   resource_name = format("%s-%s-%s", local.name_prefix, local.suffix, local.date)
-
 
   common_tags = {
     "Project"     = "Resume App"
@@ -16,7 +18,6 @@ locals {
     "Updated"     = "2025-08-18"
   }
 }
-
 
 # Origin Access Control for CloudFront
 resource "aws_cloudfront_origin_access_control" "webapp_oac" {
@@ -30,10 +31,9 @@ resource "aws_cloudfront_origin_access_control" "webapp_oac" {
 # S3 bucket for website content
 resource "aws_s3_bucket" "webapp_bucket" {
   bucket = var.domain_name
-
-  tags = merge(local.common_tags,
-  { Name = format("%s-%s", local.name_prefix, local.suffix) })
-
+  tags = merge(local.common_tags, {
+    Name = format("%s-%s", local.name_prefix, local.suffix)
+  })
 }
 
 # Block all public access - security first
@@ -55,8 +55,8 @@ resource "aws_s3_bucket_versioning" "webapp_bucket" {
 }
 
 # Server-side encryption
-resource "aws_s3_bucket_server_side_encryption_configuration" "website" {
-  bucket = aws_s3_bucket.website.id
+resource "aws_s3_bucket_server_side_encryption_configuration" "webapp_bucket" {
+  bucket = aws_s3_bucket.webapp_bucket.id
 
   rule {
     apply_server_side_encryption_by_default {
@@ -65,21 +65,21 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "website" {
   }
 }
 
-# CORRECTED: Bucket policy allowing CloudFront access without specific distribution ID
-resource "aws_s3_bucket_policy" "website" {
-  bucket = aws_s3_bucket.website.id
+# Bucket policy allowing CloudFront access
+resource "aws_s3_bucket_policy" "webapp_bucket" {
+  bucket = aws_s3_bucket.webapp_bucket.id
 
   policy = jsonencode({
     Version = "2012-10-17"
     Statement = [
       {
-        Sid       = "AllowCloudFrontServicePrincipal"
-        Effect    = "Allow"
+        Sid    = "AllowCloudFrontServicePrincipal"
+        Effect = "Allow"
         Principal = {
           Service = "cloudfront.amazonaws.com"
         }
         Action   = "s3:GetObject"
-        Resource = "${aws_s3_bucket.website.arn}/*"
+        Resource = "${aws_s3_bucket.webapp_bucket.arn}/*"
         Condition = {
           StringEquals = {
             "AWS:SourceArn" = "arn:aws:cloudfront::${data.aws_caller_identity.current.account_id}:distribution/*"
@@ -92,14 +92,19 @@ resource "aws_s3_bucket_policy" "website" {
 
 data "aws_caller_identity" "current" {}
 
-# Lifecycle configuration for cost optimization
+# Lifecycle configuration for cost optimization - FIXED WITH FILTER
 resource "aws_s3_bucket_lifecycle_configuration" "webapp_bucket" {
   count  = var.lifecycle_enabled ? 1 : 0
-  bucket = aws_s3_bucket.website.id
+  bucket = aws_s3_bucket.webapp_bucket.id
 
   rule {
     id     = "website_lifecycle"
     status = "Enabled"
+    
+    # Required filter - apply to all objects
+    filter {
+      prefix = ""
+    }
 
     abort_incomplete_multipart_upload {
       days_after_initiation = 1
@@ -116,20 +121,14 @@ resource "aws_s3_bucket_lifecycle_configuration" "webapp_bucket" {
   }
 }
 
-#Cloudwatch Metrics Configuration
-resource "aws_s3_bucket_metrics_configuration" "webapp_bucket" {
-  bucket = aws_s3_bucket.website.id
-  name   = "website_metrics"
-
-}
-
-#CORS Configuration for S3 Modern Web Practices
+# CORS Configuration for S3 Modern Web Practices
 resource "aws_s3_bucket_cors_configuration" "webapp_bucket" {
-  bucket = aws_s3_bucket.website.id
+  bucket = aws_s3_bucket.webapp_bucket.id
+
   cors_rule {
     allowed_headers = ["*"]
     allowed_methods = ["GET", "HEAD"]
-    allowed_origins = ["http://${var.domain_name}", "https://www.${var.domain_name}"]
+    allowed_origins = ["https://${var.domain_name}", "https://www.${var.domain_name}"]
     expose_headers  = ["ETag"]
     max_age_seconds = 3000
   }

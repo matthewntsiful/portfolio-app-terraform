@@ -1,29 +1,20 @@
-#Variables for S3 Module
+# =============================================================================
+# COMMON VARIABLES FOR ALL MODULES
+# =============================================================================
 
-variable "environment" {
-  description = "Environment for the S3 Bucket"
-  type        = string
-}
-
+# Domain Configuration
 variable "domain_name" {
-  description = "Domain Name for the S3 Bucket"
+  description = "The domain name for the website"
   type        = string
 }
 
-variable "enable_versioning" {
-  description = "Enable Versioning for the S3 Bucket"
-  type        = bool
-  default     = true
-}
+
+# =============================================================================
+# S3 MODULE VARIABLES
+# =============================================================================
 
 variable "lifecycle_enabled" {
-  description = "Enable lifecycle management"
+  description = "Enable S3 bucket lifecycle configuration"
   type        = bool
   default     = true
-}
-
-
-output "origin_access_control_id" {
-  description = "Origin Access Control ID"
-  value       = aws_cloudfront_origin_access_control.main.id
 }
