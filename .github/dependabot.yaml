@@ -1,0 +1,39 @@
+version: 2
+updates:
+  # Maintain dependencies for GitHub Actions
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    # Group all GitHub Actions updates together
+    groups:
+      github-actions:
+        patterns:
+          - "*"
+
+  # Maintain Terraform providers
+  - package-ecosystem: "terraform"
+    directory: "/terraform"
+    schedule:
+      interval: "weekly"
+    # Group all Terraform provider updates together
+    groups:
+      terraform-providers:
+        patterns:
+          - "*"
+    # Allow updates for patch and minor versions
+    versioning-strategy: "widen"
+
+  # Maintain Terraform module dependencies
+  - package-ecosystem: "terraform"
+    directory: "/terraform/modules"
+    schedule:
+      interval: "monthly"
+    # Group all Terraform module updates together
+    groups:
+      terraform-modules:
+        patterns:
+          - "*"
+    # Be more conservative with module updates
+    versioning-strategy: "widen"
+    open-pull-requests-limit: 5

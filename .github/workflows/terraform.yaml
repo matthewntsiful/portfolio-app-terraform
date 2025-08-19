@@ -1,0 +1,212 @@
+name: 'Terraform CI/CD'
+
+on:
+  push:
+    branches:
+      - 'main'
+      - 'devops-engineers'
+      - 'web-developers'
+    paths:
+      - 'terraform/**'
+      - '.github/workflows/terraform.yaml'
+  pull_request:
+    branches:
+      - 'main'
+      - 'devops-engineers'
+      - 'web-developers'
+    paths:
+      - 'terraform/**'
+      - '.github/workflows/terraform.yaml'
+  workflow_dispatch:
+    inputs:
+      action:
+        description: 'Terraform action to perform'
+        required: true
+        default: 'plan'
+        type: choice
+        options:
+          - plan
+          - apply
+          - destroy
+
+permissions:
+  id-token: write
+  contents: read
+
+env:
+  AWS_REGION: "us-east-1"
+  TF_STATE_BUCKET: "your-terraform-state-bucket"
+  TF_WORKING_DIR: "./terraform/infra"
+  ENVIRONMENT: "prod"
+
+jobs:
+  plan:
+    name: 'Terraform Plan'
+    runs-on: ubuntu-latest
+    environment: ${{ github.event_name == 'workflow_dispatch' && 'production' || 'staging' }}
+    outputs:
+      plan_status: ${{ steps.plan.outcome }}
+      run_id: ${{ github.run_id }}
+    
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v3
+
+    - name: Configure AWS Credentials
+      uses: aws-actions/configure-aws-credentials@v4
+      with:
+        role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
+        aws-region: ${{ env.AWS_REGION }}
+        role-session-name: github-actions-terraform-plan
+
+    - name: Setup Terraform
+      uses: hashicorp/setup-terraform@v3
+      with:
+        terraform_version: 1.12.2
+
+    - name: Terraform Init
+      id: init
+      working-directory: ${{ env.TF_WORKING_DIR }}
+      run: |
+        terraform init -input=false \
+          -backend-config="bucket=${{ env.TF_STATE_BUCKET }}" \
+          -backend-config="key=terraform.tfstate" \
+          -backend-config="region=${{ env.AWS_REGION }}"
+
+    - name: Terraform Format
+      id: fmt
+      working-directory: ${{ env.TF_WORKING_DIR }}
+      run: terraform fmt -check
+
+    - name: Terraform Validate
+      id: validate
+      working-directory: ${{ env.TF_WORKING_DIR }}
+      run: terraform validate -no-color
+
+    - name: Terraform Plan
+      id: plan
+      if: github.event_name != 'workflow_dispatch' || github.event.inputs.action == 'plan' || github.event.inputs.action == 'apply'
+      working-directory: ${{ env.TF_WORKING_DIR }}
+      run: |
+        terraform plan -input=false -no-color -out=tfplan
+        terraform show -no-color tfplan > tfplan.txt
+      continue-on-error: true
+
+    - name: Upload Terraform Plan
+      uses: actions/upload-artifact@v4
+      if: always() && steps.plan.outcome == 'success' && (github.event_name != 'workflow_dispatch' || github.event.inputs.action == 'plan' || github.event.inputs.action == 'apply')
+      with:
+        name: tfplan
+        path: ${{ env.TF_WORKING_DIR }}/tfplan.txt
+
+  apply:
+    name: 'Terraform Apply'
+    needs: plan
+    if: ((github.ref == 'refs/heads/main' || github.ref == 'refs/heads/devops-engineers') && github.event_name == 'push') || (github.event_name == 'workflow_dispatch' && github.event.inputs.action == 'apply')
+    runs-on: ubuntu-latest
+    environment: ${{ contains(github.ref, 'main') && 'production' || 'staging' }}
+    env:
+      PLAN_STATUS: ${{ needs.plan.outputs.plan_status }}
+    
+    steps:
+    - name: Check if Plan Succeeded
+      if: env.PLAN_STATUS != 'success'
+      run: exit 1
+
+    - name: Checkout
+      uses: actions/checkout@v3
+
+    - name: Download Plan Artifact
+      uses: actions/download-artifact@v4
+      with:
+        name: tfplan
+        path: ${{ env.TF_WORKING_DIR }}
+
+    - name: Configure AWS Credentials
+      uses: aws-actions/configure-aws-credentials@v4
+      with:
+        role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
+        aws-region: ${{ env.AWS_REGION }}
+        role-session-name: github-actions-terraform-apply
+
+    - name: Setup Terraform
+      uses: hashicorp/setup-terraform@v3
+      with:
+        terraform_version: 1.12.2
+
+    - name: Terraform Init
+      working-directory: ${{ env.TF_WORKING_DIR }}
+      run: terraform init -input=false
+
+    - name: Terraform Apply
+      working-directory: ${{ env.TF_WORKING_DIR }}
+      run: |
+        terraform apply -auto-approve -input=false tfplan
+        terraform output -json > tf_output.json
+      env:
+        TF_IN_AUTOMATION: true
+
+    - name: Upload Outputs
+      uses: actions/upload-artifact@v4
+      with:
+        name: tf-outputs
+        path: ${{ env.TF_WORKING_DIR }}/tf_output.json
+
+  notify:
+    name: 'Notify Status'
+    needs: [plan, apply]
+    if: always()
+    runs-on: ubuntu-latest
+    env:
+      PLAN_STATUS: ${{ needs.plan.outputs.plan_status }}
+      APPLY_STATUS: ${{ needs.apply.result || 'skipped' }}
+      RUN_ID: ${{ needs.plan.outputs.run_id }}
+    
+    steps:
+    - name: Download Outputs
+      if: needs.apply.result == 'success'
+      uses: actions/download-artifact@v4
+      with:
+        name: tf-outputs
+        path: /tmp
+
+    - name: Get Terraform Outputs
+      id: tf_output
+      if: needs.apply.result == 'success'
+      run: |
+        if [ -f "/tmp/tf_output.json" ]; then
+          echo "TF_OUTPUTS=$(cat /tmp/tf_output.json | jq -c '.')" >> $GITHUB_OUTPUT
+        else
+          echo "TF_OUTPUTS=null" >> $GITHUB_OUTPUT
+        fi
+
+    - name: Slack Notification
+      uses: rtCamp/action-slack-notify@v2
+      env:
+        SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK_URL }}
+        SLACK_COLOR: ${{ needs.apply.result == 'success' && '#36a64f' || (needs.plan.result == 'failure' && '#ff0000' || '#ffcc00') }}
+        SLACK_TITLE: >-
+          Terraform ${{ github.event.inputs.action || 'plan' }} - 
+          ${{ needs.apply.result == 'success' && '✅ Success' || 
+              (needs.plan.result == 'failure' && '❌ Failed' || '⚠️ Warning') }}
+        SLACK_MESSAGE: |
+          *Repository*: \`${{ github.repository }}\`
+          *Environment*: \`${{ env.ENVIRONMENT }}\`
+          *Action*: \`${{ github.event.inputs.action || 'plan' }}\`
+          *Status*: ${{ needs.apply.result == 'success' && '✅ Success' || (needs.plan.result == 'failure' && '❌ Failed' || (needs.apply.result == 'skipped' && '⚠️ Skipped' || '⚠️ Completed with warnings')) }}
+          *Triggered by*: ${{ github.actor }}
+          *Run URL*: <${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ env.RUN_ID }}|View Run>
+          
+          *Terraform Version*: 1.12.2
+          *Run ID*: \`${{ env.RUN_ID }}\`
+          *Plan Status*: ${{ needs.plan.result || 'skipped' }}
+          *Apply Status*: ${{ needs.apply.result || 'skipped' }}
+          
+          *Outputs*:
+          \`\`\`json
+          ${{ steps.tf_output.outputs.TF_OUTPUTS || 'No outputs available' }}
+          \`\`\`
+        SLACK_USERNAME: GitHub Actions
+        SLACK_ICON: https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png
+        SLACK_FOOTER: "${{ github.workflow }} #${{ github.run_number }}"
+        SLACK_TS: ${{ github.run_attempt }}

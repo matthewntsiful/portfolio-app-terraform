@@ -1,0 +1,155 @@
+name: Deploy Website to S3
+
+on:
+  push:
+    branches:
+      - 'main'
+      - 'devops-engineers'
+      - 'web-developers'
+    paths:
+      - 'website/**'
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  id-token: write
+
+env:
+  AWS_REGION: "us-east-1"
+
+jobs:
+  create-pr:
+    if: github.ref != 'refs/heads/main' && github.ref != 'refs/heads/devops-engineers' && github.ref != 'refs/heads/web-developers'
+    name: Create Pull Request
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Create Pull Request
+        uses: peter-evans/create-pull-request@v5
+        with:
+          title: "Website Update: ${{ github.ref_name }}"
+          body: |
+            This PR contains website updates from branch `${{ github.ref_name }}`.
+            
+            **Changes:**
+            - Website content updates
+            
+            **Reviewers:**
+            - Add reviewers as needed
+          branch: "website-update/${{ github.ref_name }}"
+          base: main
+          commit-message: "Update website content from ${{ github.ref_name }}"
+          delete-branch: true
+
+  deploy:
+    name: Deploy Website
+    runs-on: ubuntu-latest
+    environment: ${{ contains(github.ref, 'main') && 'production' || 'staging' }}
+    needs: [create-pr]
+    if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/devops-engineers' || github.ref == 'refs/heads/web-developers'
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Configure AWS Credentials
+      uses: aws-actions/configure-aws-credentials@v4
+      with:
+        role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
+        aws-region: ${{ env.AWS_REGION }}
+
+    - name: Install AWS CLI
+      run: |
+        curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+        unzip awscliv2.zip
+        sudo ./aws/install --update
+        aws --version
+
+    - name: Deploy to S3
+      run: |
+        cd website
+        
+        # Set production bucket and cache settings
+        BUCKET_NAME="${{ secrets.S3_BUCKET_NAME }}"
+        CACHE_CONTROL="public, max-age=31536000"
+        
+        # Sync files to S3 with appropriate settings
+        aws s3 sync . s3://$BUCKET_NAME \
+          --delete \
+          --cache-control "$CACHE_CONTROL" \
+          --exclude "*" \
+          --include "*.html" --include "*.css" --include "*.js" \
+          --include "*.png" --include "*.jpg" --include "*.jpeg" --include "*.gif" \
+          --include "*.svg" --include "*.ico" --include "*.json"
+        
+        # Sync assets with different cache settings
+        aws s3 sync . s3://$BUCKET_NAME \
+          --delete \
+          --cache-control "public, max-age=86400" \
+          --exclude "*" \
+          --include "assets/*" \
+          --include "css/*" \
+          --include "js/*"
+        
+        # Store bucket name for notifications
+        echo "BUCKET_NAME=$BUCKET_NAME" >> $GITHUB_ENV
+
+    - name: Invalidate CloudFront Cache
+      run: |
+        aws cloudfront create-invalidation \
+          --distribution-id ${{ secrets.CLOUDFRONT_DISTRIBUTION_ID }} \
+          --paths "/*"
+
+        CLOUDFRONT_URL=$(aws cloudfront get-distribution --id ${{ secrets.CLOUDFRONT_DISTRIBUTION_ID }} --query 'Distribution.DomainName' --output text)
+        echo "CLOUDFRONT_URL=$CLOUDFRONT_URL" >> $GITHUB_ENV
+        echo "Production website deployed to: https://${{ env.BUCKET_NAME }}.s3-website-${{ env.AWS_REGION }}.amazonaws.com"
+        echo "CloudFront URL: https://$CLOUDFRONT_URL"
+        echo "CLOUDFRONT_URL=$CLOUDFRONT_URL" >> $GITHUB_OUTPUT
+        echo "S3_WEBSITE_URL=https://${{ secrets.S3_BUCKET_NAME }}.s3-website-${{ env.AWS_REGION }}.amazonaws.com" >> $GITHUB_OUTPUT
+        echo "Website deployed to: $S3_WEBSITE_URL"
+        echo "CloudFront URL: https://$CLOUDFRONT_URL"
+    
+    - name: Verify Deployment
+      id: verify
+      run: |
+        CLOUDFRONT_URL=$(aws cloudfront get-distribution --id ${{ secrets.CLOUDFRONT_DISTRIBUTION_ID }} --query 'Distribution.DomainName' --output text)
+        echo "CLOUDFRONT_URL=$CLOUDFRONT_URL" >> $GITHUB_OUTPUT
+        echo "S3_WEBSITE_URL=https://${{ secrets.S3_BUCKET_NAME }}.s3-website-${{ env.AWS_REGION }}.amazonaws.com" >> $GITHUB_OUTPUT
+        echo "Website deployed to: $S3_WEBSITE_URL"
+        echo "CloudFront URL: https://$CLOUDFRONT_URL"
+    
+  notify:
+    name: 'Notify Deployment Status'
+    needs: deploy
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+    - name: Slack Notification
+      uses: rtCamp/action-slack-notify@v2
+      env:
+        SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK_URL }}
+        SLACK_COLOR: ${{ needs.deploy.result == 'success' && '#36a64f' || '#ff0000' }}
+        SLACK_TITLE: 'Website Deployment Status'
+        SLACK_MESSAGE: |
+          *Repository*: \`${{ github.repository }}\`
+          *Environment*: \`production\`
+          *Status*: ${{ needs.deploy.result == 'success' && '✅ Succeeded' || '❌ Failed' }}
+          *Triggered by*: ${{ github.actor }}
+          *Run URL*: <${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}|View Run>
+          
+          *Deployment Details*:
+          - Environment: Production
+          - S3 Website: https://${{ secrets.S3_BUCKET_NAME }}.s3-website-${{ env.AWS_REGION }}.amazonaws.com
+          - CloudFront: https://${{ env.CLOUDFRONT_URL }}
+          
+          *Commit*: \`${{ github.sha }}\`
+          *Branch*: \`${{ github.ref_name }}\`
+        SLACK_USERNAME: GitHub Actions
+        SLACK_ICON: https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png
+        SLACK_FOOTER: "${{ github.workflow }} #${{ github.run_number }}"
