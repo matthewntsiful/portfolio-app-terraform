@@ -1,0 +1,627 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Professional Resume Builder - Matthew Odoom Ntsiful</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.5/babel.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    animation: {
+                        'fade-in': 'fadeIn 0.6s ease-out',
+                        'fade-in-delayed': 'fadeIn 0.8s ease-out'
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .animate-fade-in {
+            animation: fadeIn 0.6s ease-out;
+        }
+        
+        @media print {
+            body { 
+                -webkit-print-color-adjust: exact; 
+                print-color-adjust: exact; 
+            }
+            .print-hidden { display: none !important; }
+            .print-shadow-none { box-shadow: none !important; }
+            .print-rounded-none { border-radius: 0 !important; }
+            .print-p-0 { padding: 0 !important; }
+            .group:hover .group-hover-opacity-100 { opacity: 0 !important; }
+        }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useRef } = React;
+
+        // Lucide Icons as simple SVG components
+        const Icons = {
+            Download: () => <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7,10 12,15 17,10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>,
+            Edit3: () => <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>,
+            Save: () => <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17,21 17,13 7,13 7,21"/><polyline points="7,3 7,8 15,8"/></svg>,
+            Plus: () => <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>,
+            Trash2: () => <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="3,6 5,6 21,6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg>,
+            GripVertical: () => <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="9" cy="12" r="1"/><circle cx="9" cy="5" r="1"/><circle cx="9" cy="19" r="1"/><circle cx="15" cy="12" r="1"/><circle cx="15" cy="5" r="1"/><circle cx="15" cy="19" r="1"/></svg>,
+            User: (props) => <svg width={props.size || "24"} height={props.size || "24"} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>,
+            Mail: () => <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>,
+            Phone: () => <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>,
+            MapPin: () => <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>,
+            Linkedin: () => <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/></svg>,
+            Github: () => <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/></svg>,
+            Code: () => <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="16,18 22,12 16,6"/><polyline points="8,6 2,12 8,18"/></svg>,
+            Briefcase: () => <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>,
+            FileText: () => <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M18,20H6V4H13V9H18V20Z"/></svg>,
+            Award: () => <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="8" r="7"/><polyline points="8.21,13.89 7,23 12,20 17,23 15.79,13.88"/></svg>,
+            GraduationCap: () => <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg>,
+            Camera: () => <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+        };
+
+        const ResumeBuilder = () => {
+            const [isEditing, setIsEditing] = useState(false);
+            const [selectedTemplate, setSelectedTemplate] = useState('modern');
+            const [draggedItem, setDraggedItem] = useState(null);
+            const printRef = useRef();
+
+            const [resumeData, setResumeData] = useState({
+                personalInfo: {
+                    name: "Matthew Odoom Ntsiful",
+                    title: "DevOps & Cloud Engineer",
+                    email: "matthew.ntsiful@gmail.com",
+                    phone: "+233 557 721 615",
+                    location: "Takoradi, Ghana",
+                    linkedin: "LinkedIn Profile",
+                    github: "GitHub Profile",
+                    credly: "Credly Profile"
+                },
+                summary: "DevOps & Cloud Engineer with 3+ years of experience automating, deploying, and scaling cloud infrastructure on AWS using tools like Terraform, Kubernetes, Docker, and GitHub Actions. Proven record of reducing AWS costs by 30%, improving deployment speed by 60%, and enhancing system visibility with Prometheus, Grafana, and CloudWatch. Skilled in Linux systems, Bash/Python scripting, and delivering secure infrastructure using IAM and TLS. AWS Cloud Practitioner certified; AWS Solutions Architect Associate in progress.",
+                sections: [
+                    {
+                        id: 'technical-skills',
+                        title: 'Technical Skills',
+                        type: 'skills',
+                        content: {
+                            categories: [
+                                { name: "Cloud Platforms", skills: ["AWS (EC2, S3, VPC, Lambda, RDS, IAM, CloudWatch, CloudFront)", "Azure (basic)", "GCP (basic)"] },
+                                { name: "IaC & Automation", skills: ["Terraform", "CloudFormation", "Bash", "Python"] },
+                                { name: "CI/CD & Containers", skills: ["GitHub Actions", "Jenkins", "Docker", "Kubernetes", "Helm"] },
+                                { name: "Monitoring", skills: ["Prometheus", "Grafana", "CloudWatch", "Loki"] },
+                                { name: "Security", skills: ["IAM", "TLS", "WAF", "Trivy", "HTTPS"] },
+                                { name: "Systems & Networking", skills: ["Linux (Ubuntu, Amazon Linux)", "DNS", "SSH", "Load Balancers"] },
+                                { name: "Databases", skills: ["PostgreSQL", "MySQL", "DynamoDB", "Redis"] }
+                            ]
+                        }
+                    },
+                    {
+                        id: 'experience',
+                        title: 'Professional Experience',
+                        type: 'experience',
+                        content: {
+                            jobs: [
+                                {
+                                    title: "DevOps & Cloud Engineer",
+                                    company: "Jomacs IT Services and Consulting",
+                                    location: "Remote, Calgary, AB",
+                                    period: "04/2022 – Present",
+                                    achievements: [
+                                        "🔹 Infrastructure & Automation",
+                                        "• Provisioned and maintained AWS infrastructure using Terraform for EC2, VPC, RDS, IAM, and S3",
+                                        "• Created reusable Terraform modules and used variables and workspaces to manage environments",
+                                        "• Automated cloud resource setup, backups, and configuration using AWS CLI, Bash, and Python",
+                                        "🔹 CI/CD Pipelines",
+                                        "• Built and managed CI/CD pipelines using GitHub Actions, automating build, test, and deployment workflows",
+                                        "• Integrated security scanning with Trivy and notifications via Slack for build status updates",
+                                        "• Helped reduce manual deployment efforts and improved release consistency",
+                                        "🔹 Kubernetes & Containers",
+                                        "• Deployed applications to AWS EKS using Helm charts and configured Ingress, TLS, and autoscaling",
+                                        "• Worked with Dockerized services and managed container images in ECR",
+                                        "• Set up ConfigMaps and Secrets to support dynamic configurations in deployments",
+                                        "🔹 Monitoring & Logging",
+                                        "• Implemented observability using Prometheus, Grafana, Loki, and AWS CloudWatch",
+                                        "• Built dashboards in Grafana to monitor application and infrastructure health",
+                                        "• Used Loki to centralize logs from Kubernetes workloads for easier troubleshooting",
+                                        "🔹 Security & Cost Optimization",
+                                        "• Enforced IAM role-based access controls, TLS encryption, and WAF rules for public-facing services",
+                                        "• Applied S3 lifecycle rules, EC2 rightsizing, and auto-shutdown scripts to optimize AWS usage",
+                                        "• Helped reduce cloud costs by ~30% through resource review and automation",
+                                        "🔹 Collaboration & Workflow",
+                                        "• Worked closely with developers and QA teams to support application delivery to test and prod environments",
+                                        "• Participated in infrastructure code reviews and DevOps planning sessions",
+                                        "• Provided knowledge-sharing on Terraform and GitHub Actions for junior team members"
+                                    ]
+                                },
+                                {
+                                    title: "IT Service Desk Analyst",
+                                    company: "Millicom Ghana Limited",
+                                    location: "Accra, Ghana",
+                                    period: "07/2014 – 09/2017",
+                                    achievements: [
+                                        "• Resolved Tier 1–2 system, access, and endpoint issues",
+                                        "• Supported user provisioning and policy compliance via Active Directory",
+                                        "• Documented technical workflows to improve ticket resolution speed"
+                                    ]
+                                },
+                                {
+                                    title: "Facility Manager",
+                                    company: "Supreme Washing Bay & Auto Detailing",
+                                    location: "Takoradi, Ghana",
+                                    period: "03/2020 – 02/2022",
+                                    achievements: [
+                                        "• Introduced automation and data tracking for facility operations",
+                                        "• Increased efficiency by 50% through workflow and resource optimization"
+                                    ]
+                                }
+                            ]
+                        }
+                    },
+                    {
+                        id: 'projects',
+                        title: 'Key Projects',
+                        type: 'projects',
+                        content: {
+                            projects: [
+                                {
+                                    name: "Kubernetes Microservices Deployment on EKS",
+                                    description: "Deployed 12+ microservices to AWS EKS using Helm, Ingress, HPA, and TLS. Built GitHub Actions pipeline for secure CI/CD and implemented observability via Prometheus and Grafana.",
+                                    skills: ["AWS EKS", "Kubernetes", "Helm", "GitHub Actions", "Prometheus", "TLS", "CI/CD"]
+                                },
+                                {
+                                    name: "Saleor E-Commerce on Kubernetes",
+                                    description: "Containerized Django + React stack with PostgreSQL on Kubernetes. Enabled autoscaling, secret management, and end-to-end TLS.",
+                                    skills: ["Kubernetes", "Docker", "PostgreSQL", "TLS", "GitHub Actions"]
+                                },
+                                {
+                                    name: "ECS E-commerce CI/CD Pipeline",
+                                    description: "Built ECS deployment workflow with GitHub Actions, Docker, and Trivy for vulnerability scanning.",
+                                    skills: ["ECS", "GitHub Actions", "Trivy", "Slack", "CI/CD"]
+                                },
+                                {
+                                    name: "S3 + CloudFront Static Website Deployment",
+                                    description: "Automated deployment of a static site with TLS, cache invalidation, and lifecycle policies using GitHub Actions.",
+                                    skills: ["S3", "CloudFront", "GitHub Actions", "TLS", "OAC"]
+                                },
+                                {
+                                    name: "Terraform AWS Infrastructure",
+                                    description: "Provisioned VPC, ECS, RDS, and IAM with modular Terraform. Enforced secure routing with ALB, WAF, and NAT gateways.",
+                                    skills: ["Terraform", "ECS", "IAM", "WAF", "Cost Optimization"]
+                                }
+                            ]
+                        }
+                    },
+                    {
+                        id: 'certifications',
+                        title: 'Certifications',
+                        type: 'certifications',
+                        content: {
+                            certs: [
+                                { name: "AWS Certified Cloud Practitioner", date: "Oct 2024", status: "Completed" },
+                                { name: "AWS re/Start Graduate", date: "July 2024", status: "Completed" },
+                                { name: "AWS Solutions Architect Associate", date: "In Progress", status: "In Progress" }
+                            ]
+                        }
+                    },
+                    {
+                        id: 'education',
+                        title: 'Education',
+                        type: 'education',
+                        content: {
+                            education: [
+                                {
+                                    degree: "Bachelor of Arts – Psychology & Linguistics",
+                                    school: "University of Ghana, Legon",
+                                    location: "Accra, Ghana",
+                                    period: "2007 – 2011"
+                                }
+                            ]
+                        }
+                    }
+                ]
+            });
+
+            const templates = {
+                modern: { name: 'Modern', class: 'bg-gradient-to-br from-slate-50 to-blue-50' },
+                minimal: { name: 'Minimal', class: 'bg-white' },
+                dark: { name: 'Dark', class: 'bg-gradient-to-br from-gray-900 to-slate-800 text-white' },
+                professional: { name: 'Professional', class: 'bg-gradient-to-b from-blue-50 to-indigo-50' }
+            };
+
+            const updatePersonalInfo = (field, value) => {
+                setResumeData(prev => ({
+                    ...prev,
+                    personalInfo: { ...prev.personalInfo, [field]: value }
+                }));
+            };
+
+            const updateSummary = (value) => {
+                setResumeData(prev => ({ ...prev, summary: value }));
+            };
+
+            const addSection = () => {
+                const newSection = {
+                    id: Date.now().toString(),
+                    title: 'New Section',
+                    type: 'custom',
+                    content: { text: 'Add your content here...' }
+                };
+                setResumeData(prev => ({
+                    ...prev,
+                    sections: [...prev.sections, newSection]
+                }));
+            };
+
+            const deleteSection = (sectionId) => {
+                setResumeData(prev => ({
+                    ...prev,
+                    sections: prev.sections.filter(section => section.id !== sectionId)
+                }));
+            };
+
+            const downloadPDF = () => {
+                window.print();
+            };
+
+            const downloadJSON = () => {
+                const dataStr = JSON.stringify(resumeData, null, 2);
+                const dataBlob = new Blob([dataStr], { type: 'application/json' });
+                const url = URL.createObjectURL(dataBlob);
+                const link = document.createElement('a');
+                link.href = url;
+                link.download = 'resume-data.json';
+                link.click();
+                URL.revokeObjectURL(url);
+            };
+
+            const EditableField = ({ value, onChange, multiline = false, className = "" }) => {
+                if (!isEditing) return React.createElement('span', { className }, value);
+                
+                if (multiline) {
+                    return React.createElement('textarea', {
+                        value,
+                        onChange: (e) => onChange(e.target.value),
+                        className: `w-full p-2 border border-gray-300 rounded resize-none ${className}`,
+                        rows: 4
+                    });
+                }
+                
+                return React.createElement('input', {
+                    type: 'text',
+                    value,
+                    onChange: (e) => onChange(e.target.value),
+                    className: `w-full p-1 border border-gray-300 rounded ${className}`
+                });
+            };
+
+            const SkillsSection = ({ section }) => (
+                <div className="space-y-4">
+                    {section.content.categories.map((category, idx) => (
+                        <div key={idx} className="space-y-2">
+                            <h4 className="font-semibold text-blue-700 dark:text-blue-300">{category.name}</h4>
+                            <div className="flex flex-wrap gap-2">
+                                {category.skills.map((skill, skillIdx) => (
+                                    <span key={skillIdx} className="px-3 py-1 bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 rounded-full text-sm font-medium">
+                                        {skill}
+                                    </span>
+                                ))}
+                            </div>
+                        </div>
+                    ))}
+                </div>
+            );
+
+            const ExperienceSection = ({ section }) => (
+                <div className="space-y-6">
+                    {section.content.jobs.map((job, idx) => (
+                        <div key={idx} className="border-l-4 border-blue-500 pl-4 space-y-2">
+                            <div className="flex flex-col md:flex-row md:justify-between md:items-start">
+                                <div>
+                                    <h4 className="font-bold text-lg text-gray-800 dark:text-white">{job.title}</h4>
+                                    <p className="text-blue-600 dark:text-blue-400 font-semibold">{job.company}</p>
+                                    <p className="text-gray-600 dark:text-gray-400 text-sm">{job.location}</p>
+                                </div>
+                                <span className="text-gray-500 dark:text-gray-400 font-medium whitespace-nowrap">{job.period}</span>
+                            </div>
+                            <ul className="space-y-1 text-gray-700 dark:text-gray-300">
+                                {job.achievements.map((achievement, achIdx) => (
+                                    <li key={achIdx} className={achievement.startsWith('🔹') ? 'font-semibold mt-3 text-blue-700 dark:text-blue-300' : 'ml-4'}>
+                                        {achievement}
+                                    </li>
+                                ))}
+                            </ul>
+                        </div>
+                    ))}
+                </div>
+            );
+
+            const ProjectsSection = ({ section }) => (
+                <div className="grid gap-6 md:grid-cols-2">
+                    {section.content.projects.map((project, idx) => (
+                        <div key={idx} className="bg-white dark:bg-gray-800 p-4 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 hover:shadow-md transition-shadow">
+                            <h4 className="font-bold text-lg text-gray-800 dark:text-white mb-2">{project.name}</h4>
+                            <p className="text-gray-600 dark:text-gray-400 text-sm mb-3">{project.description}</p>
+                            <div className="flex flex-wrap gap-1">
+                                {project.skills.map((skill, skillIdx) => (
+                                    <span key={skillIdx} className="px-2 py-1 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded text-xs">
+                                        {skill}
+                                    </span>
+                                ))}
+                            </div>
+                        </div>
+                    ))}
+                </div>
+            );
+
+            const CertificationsSection = ({ section }) => (
+                <div className="grid gap-4 md:grid-cols-3">
+                    {section.content.certs.map((cert, idx) => (
+                        <div key={idx} className="bg-white dark:bg-gray-800 p-4 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 text-center">
+                            <div className="mx-auto mb-2 text-yellow-500 flex justify-center">
+                                <Icons.Award />
+                            </div>
+                            <h4 className="font-semibold text-gray-800 dark:text-white">{cert.name}</h4>
+                            <p className="text-sm text-gray-600 dark:text-gray-400">{cert.date}</p>
+                            <span className={`inline-block px-2 py-1 rounded text-xs mt-2 ${
+                                cert.status === 'Completed' ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200' : 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200'
+                            }`}>
+                                {cert.status}
+                            </span>
+                        </div>
+                    ))}
+                </div>
+            );
+
+            const EducationSection = ({ section }) => (
+                <div className="space-y-4">
+                    {section.content.education.map((edu, idx) => (
+                        <div key={idx} className="border-l-4 border-green-500 pl-4">
+                            <h4 className="font-bold text-lg text-gray-800 dark:text-white">{edu.degree}</h4>
+                            <p className="text-green-600 dark:text-green-400 font-semibold">{edu.school}</p>
+                            <div className="flex justify-between text-sm text-gray-600 dark:text-gray-400">
+                                <span>{edu.location}</span>
+                                <span>{edu.period}</span>
+                            </div>
+                        </div>
+                    ))}
+                </div>
+            );
+
+            const renderSectionContent = (section) => {
+                switch (section.type) {
+                    case 'skills':
+                        return <SkillsSection section={section} />;
+                    case 'experience':
+                        return <ExperienceSection section={section} />;
+                    case 'projects':
+                        return <ProjectsSection section={section} />;
+                    case 'certifications':
+                        return <CertificationsSection section={section} />;
+                    case 'education':
+                        return <EducationSection section={section} />;
+                    default:
+                        return <p className="text-gray-600 dark:text-gray-400">{section.content.text}</p>;
+                }
+            };
+
+            const getSectionIcon = (type) => {
+                switch (type) {
+                    case 'skills': return <Icons.Code />;
+                    case 'experience': return <Icons.Briefcase />;
+                    case 'projects': return <Icons.FileText />;
+                    case 'certifications': return <Icons.Award />;
+                    case 'education': return <Icons.GraduationCap />;
+                    default: return <Icons.FileText />;
+                }
+            };
+
+            return (
+                <div className="min-h-screen bg-gray-100 dark:bg-gray-900">
+                    {/* Header Controls */}
+                    <div className="bg-white dark:bg-gray-800 shadow-sm border-b border-gray-200 dark:border-gray-700 sticky top-0 z-10 print-hidden">
+                        <div className="max-w-7xl mx-auto px-4 py-4">
+                            <div className="flex flex-wrap items-center justify-between gap-4">
+                                <h1 className="text-2xl font-bold text-gray-800 dark:text-white">Resume Builder</h1>
+                                
+                                <div className="flex items-center gap-3">
+                                    {/* Template Selector */}
+                                    <select
+                                        value={selectedTemplate}
+                                        onChange={(e) => setSelectedTemplate(e.target.value)}
+                                        className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300"
+                                    >
+                                        {Object.entries(templates).map(([key, template]) => (
+                                            <option key={key} value={key}>{template.name}</option>
+                                        ))}
+                                    </select>
+
+                                    {/* Action Buttons */}
+                                    <button
+                                        onClick={() => setIsEditing(!isEditing)}
+                                        className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-colors ${
+                                            isEditing 
+                                                ? 'bg-green-600 hover:bg-green-700 text-white' 
+                                                : 'bg-blue-600 hover:bg-blue-700 text-white'
+                                        }`}
+                                    >
+                                        {isEditing ? <Icons.Save /> : <Icons.Edit3 />}
+                                        {isEditing ? 'Save' : 'Edit'}
+                                    </button>
+
+                                    <button
+                                        onClick={downloadPDF}
+                                        className="flex items-center gap-2 px-4 py-2 bg-gray-600 hover:bg-gray-700 text-white rounded-lg font-medium transition-colors"
+                                    >
+                                        <Icons.Download />
+                                        PDF
+                                    </button>
+
+                                    <button
+                                        onClick={downloadJSON}
+                                        className="flex items-center gap-2 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg font-medium transition-colors"
+                                    >
+                                        <Icons.FileText />
+                                        JSON
+                                    </button>
+
+                                    {isEditing && (
+                                        <button
+                                            onClick={addSection}
+                                            className="flex items-center gap-2 px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg font-medium transition-colors"
+                                        >
+                                            <Icons.Plus />
+                                            Section
+                                        </button>
+                                    )}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Resume Content */}
+                    <div className="max-w-4xl mx-auto p-6">
+                        <div className={`${templates[selectedTemplate].class} rounded-xl shadow-xl p-8 print-shadow-none print-rounded-none print-p-0 animate-fade-in`} ref={printRef}>
+                            
+                            {/* Header Section */}
+                            <div className="text-center mb-8 space-y-4">
+                                <div className="relative inline-block">
+                                    <div className="w-24 h-24 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-full mx-auto mb-4 flex items-center justify-center">
+                                        <Icons.User size={40} className="text-white" />
+                                    </div>
+                                    {isEditing && (
+                                        <button className="absolute bottom-0 right-0 bg-blue-500 hover:bg-blue-600 text-white p-2 rounded-full shadow-lg transition-colors">
+                                            <Icons.Camera />
+                                        </button>
+                                    )}
+                                </div>
+
+                                <EditableField
+                                    value={resumeData.personalInfo.name}
+                                    onChange={(value) => updatePersonalInfo('name', value)}
+                                    className="text-4xl font-bold text-gray-800 dark:text-white"
+                                />
+                                
+                                <EditableField
+                                    value={resumeData.personalInfo.title}
+                                    onChange={(value) => updatePersonalInfo('title', value)}
+                                    className="text-xl text-blue-600 dark:text-blue-400 font-medium"
+                                />
+
+                                {/* Contact Information */}
+                                <div className="flex flex-wrap justify-center gap-4 text-sm text-gray-600 dark:text-gray-400">
+                                    <div className="flex items-center gap-2">
+                                        <Icons.Mail />
+                                        <EditableField
+                                            value={resumeData.personalInfo.email}
+                                            onChange={(value) => updatePersonalInfo('email', value)}
+                                        />
+                                    </div>
+                                    <div className="flex items-center gap-2">
+                                        <Icons.Phone />
+                                        <EditableField
+                                            value={resumeData.personalInfo.phone}
+                                            onChange={(value) => updatePersonalInfo('phone', value)}
+                                        />
+                                    </div>
+                                    <div className="flex items-center gap-2">
+                                        <Icons.MapPin />
+                                        <EditableField
+                                            value={resumeData.personalInfo.location}
+                                            onChange={(value) => updatePersonalInfo('location', value)}
+                                        />
+                                    </div>
+                                    <div className="flex items-center gap-2">
+                                        <Icons.Linkedin />
+                                        <EditableField
+                                            value={resumeData.personalInfo.linkedin}
+                                            onChange={(value) => updatePersonalInfo('linkedin', value)}
+                                        />
+                                    </div>
+                                    <div className="flex items-center gap-2">
+                                        <Icons.Github />
+                                        <EditableField
+                                            value={resumeData.personalInfo.github}
+                                            onChange={(value) => updatePersonalInfo('github', value)}
+                                        />
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Professional Summary */}
+                            <div className="mb-8">
+                                <h3 className="text-2xl font-bold text-gray-800 dark:text-white mb-4 flex items-center gap-2">
+                                    <Icons.User size={24} />
+                                    Professional Summary
+                                </h3>
+                                <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
+                                    <EditableField
+                                        value={resumeData.summary}
+                                        onChange={updateSummary}
+                                        multiline={true}
+                                        className="text-gray-700 dark:text-gray-300 leading-relaxed"
+                                    />
+                                </div>
+                            </div>
+
+                            {/* Dynamic Sections */}
+                            {resumeData.sections.map((section, index) => (
+                                <div
+                                    key={section.id}
+                                    className={`mb-8 relative group ${isEditing ? 'border-2 border-dashed border-transparent hover:border-blue-300 dark:hover:border-blue-600 rounded-lg p-2' : ''}`}
+                                >
+                                    <div className="flex items-center justify-between mb-4">
+                                        <h3 className="text-2xl font-bold text-gray-800 dark:text-white flex items-center gap-2">
+                                            {getSectionIcon(section.type)}
+                                            <EditableField
+                                                value={section.title}
+                                                onChange={(value) => {
+                                                    setResumeData(prev => ({
+                                                        ...prev,
+                                                        sections: prev.sections.map(s => 
+                                                            s.id === section.id ? { ...s, title: value } : s
+                                                        )
+                                                    }));
+                                                }}
+                                            />
+                                        </h3>
+                                        
+                                        {isEditing && (
+                                            <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity print-hidden">
+                                                <Icons.GripVertical className="text-gray-400 cursor-move" />
+                                                <button
+                                                    onClick={() => deleteSection(section.id)}
+                                                    className="p-1 text-red-500 hover:text-red-700 transition-colors"
+                                                >
+                                                    <Icons.Trash2 />
+                                                </button>
+                                            </div>
+                                        )}
+                                    </div>
+
+                                    <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
+                                        {renderSectionContent(section)}
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+
+        ReactDOM.render(<ResumeBuilder />, document.getElementById('root'));
+    </script>
+</body>
+</html>
