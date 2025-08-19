@@ -100,7 +100,7 @@ resource "aws_s3_bucket_lifecycle_configuration" "webapp_bucket" {
   rule {
     id     = "website_lifecycle"
     status = "Enabled"
-    
+
     # Required filter - apply to all objects
     filter {
       prefix = ""
@@ -111,16 +111,16 @@ resource "aws_s3_bucket_lifecycle_configuration" "webapp_bucket" {
     }
 
     noncurrent_version_expiration {
-      noncurrent_days = 90  # Delete old versions after 90 days
+      noncurrent_days = 90 # Delete old versions after 90 days
     }
 
     noncurrent_version_transition {
-      noncurrent_days = 30  # FIXED: Must be >= 30 for STANDARD_IA
+      noncurrent_days = 30 # FIXED: Must be >= 30 for STANDARD_IA
       storage_class   = "STANDARD_IA"
     }
 
     noncurrent_version_transition {
-      noncurrent_days = 60  # Move to Glacier after 60 days
+      noncurrent_days = 60 # Move to Glacier after 60 days
       storage_class   = "GLACIER"
     }
   }
