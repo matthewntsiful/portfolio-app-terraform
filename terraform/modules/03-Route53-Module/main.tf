@@ -1,3 +1,7 @@
+# =============================================================================
+# ROUTE53 MODULE - RESOURCE DEFINITION
+# =============================================================================
+
 locals {
   name_prefix   = "resume-webapp"
   suffix        = "route53"
@@ -15,17 +19,16 @@ locals {
   }
 }
 
-#Hosted Zone
+# Hosted Zone
 resource "aws_route53_zone" "main" {
   name = var.domain_name
 
-  tags = merge(local.common_tags,
-  { Name = format("%s-%s-hosted-zone", local.name_prefix, local.suffix) })
-
-
+  tags = merge(local.common_tags, {
+    Name = format("%s-%s-hosted-zone", local.name_prefix, local.suffix)
+  })
 }
 
-#A Record for Apex Domain
+# A Record for Apex Domain
 resource "aws_route53_record" "apex" {
   zone_id = aws_route53_zone.main.zone_id
   name    = var.domain_name
@@ -36,10 +39,9 @@ resource "aws_route53_record" "apex" {
     zone_id                = var.cloudfront_distribution_zone
     evaluate_target_health = false
   }
-
 }
 
-#A Record for www Subdomain
+# A Record for www Subdomain
 resource "aws_route53_record" "www" {
   zone_id = aws_route53_zone.main.zone_id
   name    = "www.${var.domain_name}"
@@ -50,10 +52,9 @@ resource "aws_route53_record" "www" {
     zone_id                = var.cloudfront_distribution_zone
     evaluate_target_health = false
   }
-
 }
 
-#AAAA Records for Ipv6 Support
+# AAAA Records for IPv6 Support
 resource "aws_route53_record" "ipv6" {
   zone_id = aws_route53_zone.main.zone_id
   name    = var.domain_name
@@ -64,7 +65,6 @@ resource "aws_route53_record" "ipv6" {
     zone_id                = var.cloudfront_distribution_zone
     evaluate_target_health = false
   }
-
 }
 
 resource "aws_route53_record" "www_ipv6" {
@@ -77,27 +77,25 @@ resource "aws_route53_record" "www_ipv6" {
     zone_id                = var.cloudfront_distribution_zone
     evaluate_target_health = false
   }
-
 }
 
-#Health Check for Website Monitoring
+# Health Check for Website Monitoring - FIXED insufficient_data_health_status
 resource "aws_route53_health_check" "main" {
-  count             = var.enable_health_check ? 1 : 0
-  fqdn              = var.domain_name
-  port              = 443
-  type              = "HTTPS"
-  resource_path     = "/"
-  failure_threshold = 3
-  request_interval  = 30
-  # cloudwatch_logs_region = "us-east-1"
-  # cloudwatch_alarm_region = var.region
-  insufficient_data_health_status = "Failure"
-  tags = merge(local.common_tags,
-  { Name = format("%s-%s-health-check", local.name_prefix, local.suffix) })
+  count                            = var.enable_health_check ? 1 : 0
+  fqdn                             = var.domain_name
+  port                             = 443
+  type                             = "HTTPS"
+  resource_path                    = "/"
+  failure_threshold                = 3
+  request_interval                 = 30
+  insufficient_data_health_status  = "LastKnownStatus"  # FIXED: was "Failure"
 
+  tags = merge(local.common_tags, {
+    Name = format("%s-%s-health-check", local.name_prefix, local.suffix)
+  })
 }
 
-#CloudWatch Alarm For Health Checks
+# CloudWatch Alarm For Health Checks
 resource "aws_cloudwatch_metric_alarm" "health_check" {
   count               = var.enable_health_check ? 1 : 0
   alarm_name          = "${var.domain_name}-health-check-alarm"
@@ -108,18 +106,24 @@ resource "aws_cloudwatch_metric_alarm" "health_check" {
   period              = 60
   statistic           = "Minimum"
   threshold           = 1
-  alarm_description   = "This metrics MonitorsHealth Check Status"
+  alarm_description   = "This metric monitors health check status"
   alarm_actions       = [aws_sns_topic.alert[0].arn]
 
   dimensions = {
     HealthCheckId = aws_route53_health_check.main[0].id
   }
+
+  tags = merge(local.common_tags, {
+    Name = format("%s-health-alarm", local.name_prefix)
+  })
 }
 
-
-#SNS topic for Health check Alerts
+# SNS topic for Health check Alerts
 resource "aws_sns_topic" "alert" {
-
   count = var.enable_health_check ? 1 : 0
   name  = "${var.domain_name}-health-alert"
+
+  tags = merge(local.common_tags, {
+    Name = format("%s-health-alerts", local.name_prefix)
+  })
 }

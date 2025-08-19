@@ -1,26 +1,30 @@
-#Route53 Module Variables 
+# =============================================================================
+# COMMON VARIABLES FOR ALL MODULES
+# =============================================================================
+
+# Domain Configuration
 variable "domain_name" {
+  description = "The domain name for the website"
   type        = string
-  description = "Domain Name for Route53"
 }
 
+
+# =============================================================================
+# ROUTE53 MODULE VARIABLES  
+# =============================================================================
+
 variable "cloudfront_distribution_domain" {
+  description = "Domain name of the CloudFront distribution"
   type        = string
-  description = "CloudFront Distribution Domain Name"
 }
 
 variable "cloudfront_distribution_zone" {
+  description = "Hosted zone ID of the CloudFront distribution"
   type        = string
-  description = "CloudFront Distribution Zone ID"
-}
-
-variable "environment" {
-  type        = string
-  description = "Environment for Route53"
 }
 
 variable "enable_health_check" {
+  description = "Enable Route53 health checks"
   type        = bool
-  description = "Enable Health Check"
-  default     = true
+  default     = false
 }
