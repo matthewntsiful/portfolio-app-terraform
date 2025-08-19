@@ -4,7 +4,7 @@
 
 # S3 Module - Create first
 module "s3" {
-  source = "./modules/00-S3-Module"
+  source = "../modules/00-S3-Module"
   
   domain_name       = var.domain_name
   lifecycle_enabled = var.lifecycle_enabled
@@ -12,20 +12,23 @@ module "s3" {
 
 # Route53 Module - Create second (needed for certificate validation)
 module "route53" {
-  source = "./modules/03-Route53-Module"
-  
+  source = "../modules/03-Route53-Module"
   domain_name         = var.domain_name
+  cloudfront_distribution_domain = module.cloudfront.distribution_domain_name
+  cloudfront_distribution_zone   = module.cloudfront.distribution_hosted_zone_id
   enable_health_check = false  # Will enable after CloudFront is created
 }
 
 # WAF Module - Create third
 module "waf" {
-  source = "./modules/02-Waf-Module"
-}
+  source = "../modules/02-Waf-Module"
 
+  environment = var.environment
+}
+ 
 # CloudFront Module - Create after Route53 (needs hosted zone for cert validation)
 module "cloudfront" {
-  source = "./modules/01-CloudFront-Module"
+  source = "../modules/01-CloudFront-Module"
   
   domain_name                   = var.domain_name
   s3_bucket_regional_domain    = module.s3.bucket_regional_domain_name
@@ -38,7 +41,7 @@ module "cloudfront" {
 
 # Route53 Records - Create after CloudFront
 module "route53_records" {
-  source = "./modules/04-Route53-Records-Module"
+  source = "../modules/04-Route53-Records-Module"
   
   domain_name                    = var.domain_name
   hosted_zone_id                = module.route53.hosted_zone_id
