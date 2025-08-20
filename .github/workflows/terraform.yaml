@@ -70,7 +70,7 @@ jobs:
       run: |
         terraform init -input=false \
           -backend-config="bucket=${{ env.TF_STATE_BUCKET }}" \
-          -backend-config="key=terraform.tfstate" \
+          -backend-config="key=infra/terraform.tfstate" \
           -backend-config="region=${{ env.AWS_REGION }}"
 
     - name: Terraform Format
@@ -210,4 +210,3 @@ jobs:
         SLACK_ICON: https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png
         SLACK_FOOTER: "${{ github.workflow }} #${{ github.run_number }}"
         SLACK_TS: ${{ github.run_attempt }}
-          
