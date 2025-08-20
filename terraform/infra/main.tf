@@ -16,7 +16,7 @@ module "route53" {
   domain_name                    = var.domain_name
   cloudfront_distribution_domain = module.cloudfront.distribution_domain_name
   cloudfront_distribution_zone   = module.cloudfront.distribution_hosted_zone_id
-  enable_health_check            = false # Will enable after CloudFront is created
+  enable_health_check            = var.enable_health_check
 }
 
 # WAF Module - Create third
@@ -40,15 +40,4 @@ module "cloudfront" {
   enable_logging            = var.enable_logging
   cloudfront_price_class    = var.cloudfront_price_class
   hosted_zone_id            = module.route53.hosted_zone_id
-}
-
-# Route53 Records - Create after CloudFront
-module "route53_records" {
-  source = "../modules/04-Route53-Records-Module"
-
-  domain_name                    = var.domain_name
-  hosted_zone_id                 = module.route53.hosted_zone_id
-  cloudfront_distribution_domain = module.cloudfront.distribution_domain_name
-  cloudfront_distribution_zone   = module.cloudfront.distribution_hosted_zone_id
-  enable_health_check            = var.enable_health_check
 }
