@@ -1,5 +1,5 @@
 # =============================================================================
-# ROUTE53 RECORDS MODULE - SEPARATE FROM HOSTED ZONE
+# ROUTE53 RECORDS MODULE - HEALTH CHECKS AND MONITORING
 # =============================================================================
 
 locals {
@@ -11,61 +11,10 @@ locals {
     "Project"     = "Resume App"
     "Environment" = "Production"
     "Owner"       = "Matthew Ntsiful"
-    "Purpose"     = "Resume App Route53 Records"
+    "Purpose"     = "Resume App Route53 Health Checks"
     "Managed"     = "Terraform"
     "Created"     = "2025-08-18"
     "Updated"     = "2025-08-18"
-  }
-}
-
-# A Record for Apex Domain
-resource "aws_route53_record" "apex" {
-  zone_id = var.hosted_zone_id
-  name    = var.domain_name
-  type    = "A"
-
-  alias {
-    name                   = var.cloudfront_distribution_domain
-    zone_id                = var.cloudfront_distribution_zone
-    evaluate_target_health = false
-  }
-}
-
-# A Record for www Subdomain
-resource "aws_route53_record" "www" {
-  zone_id = var.hosted_zone_id
-  name    = "www.${var.domain_name}"
-  type    = "A"
-
-  alias {
-    name                   = var.cloudfront_distribution_domain
-    zone_id                = var.cloudfront_distribution_zone
-    evaluate_target_health = false
-  }
-}
-
-# AAAA Records for IPv6 Support
-resource "aws_route53_record" "ipv6" {
-  zone_id = var.hosted_zone_id
-  name    = var.domain_name
-  type    = "AAAA"
-
-  alias {
-    name                   = var.cloudfront_distribution_domain
-    zone_id                = var.cloudfront_distribution_zone
-    evaluate_target_health = false
-  }
-}
-
-resource "aws_route53_record" "www_ipv6" {
-  zone_id = var.hosted_zone_id
-  name    = "www.${var.domain_name}"
-  type    = "AAAA"
-
-  alias {
-    name                   = var.cloudfront_distribution_domain
-    zone_id                = var.cloudfront_distribution_zone
-    evaluate_target_health = false
   }
 }
 
