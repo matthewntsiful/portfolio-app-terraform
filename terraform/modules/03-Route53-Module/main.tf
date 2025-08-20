@@ -19,18 +19,15 @@ locals {
   }
 }
 
-# Hosted Zone
-resource "aws_route53_zone" "main" {
-  name = var.domain_name
-
-  tags = merge(local.common_tags, {
-    Name = format("%s-%s-hosted-zone", local.name_prefix, local.suffix)
-  })
+# Data source for existing Hosted Zone
+data "aws_route53_zone" "main" {
+  name         = var.domain_name
+  private_zone = false
 }
 
 # A Record for Apex Domain
 resource "aws_route53_record" "apex" {
-  zone_id = aws_route53_zone.main.zone_id
+  zone_id = data.aws_route53_zone.main.zone_id
   name    = var.domain_name
   type    = "A"
 
@@ -43,7 +40,7 @@ resource "aws_route53_record" "apex" {
 
 # A Record for www Subdomain
 resource "aws_route53_record" "www" {
-  zone_id = aws_route53_zone.main.zone_id
+  zone_id = data.aws_route53_zone.main.zone_id
   name    = "www.${var.domain_name}"
   type    = "A"
 
@@ -56,7 +53,7 @@ resource "aws_route53_record" "www" {
 
 # AAAA Records for IPv6 Support
 resource "aws_route53_record" "ipv6" {
-  zone_id = aws_route53_zone.main.zone_id
+  zone_id = data.aws_route53_zone.main.zone_id
   name    = var.domain_name
   type    = "AAAA"
 
@@ -68,7 +65,7 @@ resource "aws_route53_record" "ipv6" {
 }
 
 resource "aws_route53_record" "www_ipv6" {
-  zone_id = aws_route53_zone.main.zone_id
+  zone_id = data.aws_route53_zone.main.zone_id
   name    = "www.${var.domain_name}"
   type    = "AAAA"
 
