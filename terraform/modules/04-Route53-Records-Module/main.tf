@@ -71,14 +71,13 @@ resource "aws_route53_record" "www_ipv6" {
 
 # Health Check for Website Monitoring
 resource "aws_route53_health_check" "main" {
-  count                           = var.enable_health_check ? 1 : 0
-  fqdn                            = var.domain_name
-  port                            = 443
-  type                            = "HTTPS"
-  resource_path                   = "/"
-  failure_threshold               = 3
-  request_interval                = 30
-  insufficient_data_health_status = "LastKnownStatus"
+  count             = var.enable_health_check ? 1 : 0
+  fqdn              = var.domain_name
+  port              = 443
+  type              = "HTTPS"
+  resource_path     = "/"
+  failure_threshold = 3
+  request_interval  = 30
 
   tags = merge(local.common_tags, {
     Name = format("%s-health-check", local.name_prefix)
