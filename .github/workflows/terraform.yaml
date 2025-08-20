@@ -187,28 +187,23 @@ jobs:
     needs: [plan, apply]
     if: always()
     runs-on: ubuntu-latest
-    env:
-      PLAN_STATUS: ${{ needs.plan.outputs.plan_status }}
-      APPLY_STATUS: ${{ needs.apply.result || 'skipped' }}
-      RUN_ID: ${{ needs.plan.outputs.run_id }}
-    
     steps:
-    - name: Download Outputs
-      if: needs.apply.result == 'success'
-      uses: actions/download-artifact@v4
-      with:
-        name: tf-outputs
-        path: /tmp
+    - name: Checkout
+      uses: actions/checkout@v4
+
+    - name: Check Job Status
+      id: check_status
+      run: |
+        if [[ "${{ needs.plan.result }}" == "success" && "${{ needs.apply.result }}" == "success" ]]; then
+          echo "status=success" >> $GITHUB_OUTPUT
+        else
+          echo "status=failure" >> $GITHUB_OUTPUT
+        fi
 
     - name: Get Terraform Outputs
-      id: tf_output
       if: needs.apply.result == 'success'
       run: |
-        if [ -f "/tmp/tf_output.json" ]; then
-          echo "TF_OUTPUTS=$(cat /tmp/tf_output.json | jq -c '.')" >> $GITHUB_OUTPUT
-        else
-          echo "TF_OUTPUTS=null" >> $GITHUB_OUTPUT
-        fi
+        echo "No outputs to process"
 
     - name: Slack Notification
       uses: rtCamp/action-slack-notify@v2
@@ -225,16 +220,16 @@ jobs:
           *Action*: \`${{ github.event.inputs.action || 'plan' }}\`
           *Status*: ${{ needs.apply.result == 'success' && '✅ Success' || (needs.plan.result == 'failure' && '❌ Failed' || (needs.apply.result == 'skipped' && '⚠️ Skipped' || '⚠️ Completed with warnings')) }}
           *Triggered by*: ${{ github.actor }}
-          *Run URL*: <${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ env.RUN_ID }}|View Run>
+          *Run URL*: <${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}|View Run>
           
           *Terraform Version*: 1.12.2
-          *Run ID*: \`${{ env.RUN_ID }}\`
+          *Run ID*: \`${{ github.run_id }}\`
           *Plan Status*: ${{ needs.plan.result || 'skipped' }}
           *Apply Status*: ${{ needs.apply.result || 'skipped' }}
           
           *Outputs*:
           \`\`\`json
-          ${{ steps.tf_output.outputs.TF_OUTPUTS || 'No outputs available' }}
+          No outputs available
           \`\`\`
         SLACK_USERNAME: GitHub Actions
         SLACK_ICON: https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png
