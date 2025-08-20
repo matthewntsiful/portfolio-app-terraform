@@ -8,8 +8,12 @@ on:
       - 'web-developers'
     paths:
       - 'website/**'
+      - '.github/workflows/deploy-website.yaml'
   pull_request:
     branches: [ main ]
+    paths:
+      - 'website/**'
+      - '.github/workflows/deploy-website.yaml'
   workflow_dispatch:
 
 permissions:
@@ -153,4 +157,3 @@ jobs:
         SLACK_USERNAME: GitHub Actions
         SLACK_ICON: https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png
         SLACK_FOOTER: "${{ github.workflow }} #${{ github.run_number }}"
-###
