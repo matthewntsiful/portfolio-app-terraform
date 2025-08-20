@@ -136,21 +136,51 @@ jobs:
 
     - name: Terraform Init
       working-directory: ${{ env.TF_WORKING_DIR }}
-      run: terraform init -input=false
+      run: |
+        terraform init -input=false \
+          -backend-config="bucket=${{ env.TF_STATE_BUCKET }}" \
+          -backend-config="key=infra/terraform.tfstate" \
+          -backend-config="region=${{ env.AWS_REGION }}"
 
     - name: Terraform Apply
       working-directory: ${{ env.TF_WORKING_DIR }}
-      run: |
-        terraform apply -auto-approve -input=false tfplan
-        terraform output -json > tf_output.json
-      env:
-        TF_IN_AUTOMATION: true
+      run: terraform apply -auto-approve tfplan
 
-    - name: Upload Outputs
-      uses: actions/upload-artifact@v4
+  destroy:
+    name: 'Terraform Destroy'
+    if: github.event_name == 'workflow_dispatch' && github.event.inputs.action == 'destroy'
+    runs-on: ubuntu-latest
+    environment: production
+    
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+
+    - name: Configure AWS Credentials
+      uses: aws-actions/configure-aws-credentials@v4
       with:
-        name: tf-outputs
-        path: ${{ env.TF_WORKING_DIR }}/tf_output.json
+        role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
+        aws-region: ${{ env.AWS_REGION }}
+        role-session-name: github-actions-terraform-destroy
+
+    - name: Setup Terraform
+      uses: hashicorp/setup-terraform@v3
+      with:
+        terraform_version: 1.12.2
+
+    - name: Terraform Init
+      working-directory: ${{ env.TF_WORKING_DIR }}
+      run: |
+        terraform init -input=false \
+          -backend-config="bucket=${{ env.TF_STATE_BUCKET }}" \
+          -backend-config="key=infra/terraform.tfstate" \
+          -backend-config="region=${{ env.AWS_REGION }}"
+
+    - name: Terraform Destroy
+      working-directory: ${{ env.TF_WORKING_DIR }}
+      run: |
+        terraform plan -destroy -out=destroy.tfplan
+        terraform apply -auto-approve destroy.tfplan
 
   notify:
     name: 'Notify Status'
