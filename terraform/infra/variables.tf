@@ -48,14 +48,40 @@ variable "aws_region" {
 }
 
 variable "cloudfront_price_class" {
-  description = "CloudFront distribution price class"
+  description = "The price class for CloudFront distribution (PriceClass_100, PriceClass_200, PriceClass_All)"
   type        = string
   default     = "PriceClass_100"
 
   validation {
-    condition     = contains(["PriceClass_All", "PriceClass_200", "PriceClass_100"], var.cloudfront_price_class)
-    error_message = "Price class must be 'PriceClass_All', 'PriceClass_200', or 'PriceClass_100'."
+    condition     = contains(["PriceClass_100", "PriceClass_200", "PriceClass_All"], var.cloudfront_price_class)
+    error_message = "CloudFront price class must be one of: PriceClass_100, PriceClass_200, or PriceClass_All."
   }
+}
+
+# VPC and Networking
+variable "vpc_id" {
+  description = "The VPC ID where security groups will be created"
+  type        = string
+  default     = ""
+}
+
+variable "enable_vpc_endpoint" {
+  description = "Whether to create a VPC endpoint for S3"
+  type        = bool
+  default     = false
+}
+
+variable "route_table_ids" {
+  description = "List of route table IDs for VPC endpoint association"
+  type        = list(string)
+  default     = []
+}
+
+# Tags
+variable "tags" {
+  description = "A map of tags to add to all resources"
+  type        = map(string)
+  default     = {}
 }
 
 # Optional: Additional tags

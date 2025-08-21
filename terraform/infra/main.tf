@@ -2,7 +2,21 @@
 # ROOT MODULE MAIN.TF - MODULE INTEGRATION
 # =============================================================================
 
-# S3 Module - Create first
+# Import existing VPC
+data "aws_vpc" "main" {
+  id = var.vpc_id
+}
+
+# Security Group Module - Create first
+module "security_groups" {
+  source = "../modules/04-CloudFront-Security-Group"
+  
+  name_prefix = "resume-webapp"
+  vpc_id     = data.aws_vpc.main.id
+  tags       = var.tags
+}
+
+# S3 Module - Create after security groups
 module "s3" {
   source = "../modules/00-S3-Module"
 
@@ -42,30 +56,3 @@ module "cloudfront" {
   cloudfront_price_class    = var.cloudfront_price_class
   hosted_zone_id            = module.route53.hosted_zone_id
 }
-
-
-# # In your root main.tf, add this after the modules:
-# resource "aws_s3_bucket_policy" "webapp_bucket_policy_update" {
-#   depends_on = [module.cloudfront]
-
-#   bucket = module.s3.bucket_name
-#   policy = jsonencode({
-#     Version = "2012-10-17"
-#     Statement = [
-#       {
-#         Sid    = "AllowCloudFrontServicePrincipal"
-#         Effect = "Allow"
-#         Principal = {
-#           Service = "cloudfront.amazonaws.com"
-#         }
-#         Action   = "s3:GetObject"
-#         Resource = "${module.s3.bucket_arn}/*"
-#         Condition = {
-#           StringEquals = {
-#             "AWS:SourceArn" = module.cloudfront.distribution_arn
-#           }
-#         }
-#       }
-#     ]
-#   })
-# }
