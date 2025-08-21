@@ -1,0 +1,153 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Matthew's Portfolio Design System - Dark Theme with Vibrant Accents */
+
+@layer base {
+  :root {
+    /* Dark theme color palette */
+    --background: 222 84% 4.9%;
+    --foreground: 210 40% 98%;
+
+    --card: 222 84% 6%;
+    --card-foreground: 210 40% 98%;
+
+    --popover: 222 84% 6%;
+    --popover-foreground: 210 40% 98%;
+
+    /* Vibrant primary - Electric Blue */
+    --primary: 217 91% 60%;
+    --primary-foreground: 222 84% 4.9%;
+
+    /* Secondary - Dark with subtle accent */
+    --secondary: 222 47% 11%;
+    --secondary-foreground: 210 40% 98%;
+
+    --muted: 215 32% 17%;
+    --muted-foreground: 215 20% 65%;
+
+    /* Accent - Purple */
+    --accent: 271 81% 56%;
+    --accent-foreground: 210 40% 98%;
+
+    /* Success/Green accent */
+    --success: 142 76% 36%;
+    --success-foreground: 210 40% 98%;
+
+    --destructive: 0 85% 60%;
+    --destructive-foreground: 210 40% 98%;
+
+    --border: 215 32% 17%;
+    --input: 215 32% 17%;
+    --ring: 217 91% 60%;
+
+    --radius: 0.75rem;
+
+    /* Custom gradients */
+    --gradient-hero: linear-gradient(135deg, hsl(222 84% 4.9%), hsl(222 47% 11%), hsl(217 91% 60% / 0.1));
+    --gradient-card: linear-gradient(145deg, hsl(222 84% 6% / 0.8), hsl(215 32% 17% / 0.4));
+    --gradient-accent: linear-gradient(90deg, hsl(217 91% 60%), hsl(271 81% 56%), hsl(142 76% 36%));
+    
+    /* Shadows and glows */
+    --shadow-glow: 0 0 40px hsl(217 91% 60% / 0.15);
+    --shadow-card: 0 8px 32px hsl(222 84% 4.9% / 0.3);
+    --shadow-accent: 0 4px 20px hsl(217 91% 60% / 0.25);
+
+    /* Animation timings */
+    --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-bounce: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+
+    --sidebar-background: 0 0% 98%;
+
+    --sidebar-foreground: 240 5.3% 26.1%;
+
+    --sidebar-primary: 240 5.9% 10%;
+
+    --sidebar-primary-foreground: 0 0% 98%;
+
+    --sidebar-accent: 240 4.8% 95.9%;
+
+    --sidebar-accent-foreground: 240 5.9% 10%;
+
+    --sidebar-border: 220 13% 91%;
+
+    --sidebar-ring: 217.2 91.2% 59.8%;
+  }
+}
+
+@layer components {
+  /* Hero section styles */
+  .hero-gradient {
+    background: var(--gradient-hero);
+  }
+  
+  .card-gradient {
+    background: var(--gradient-card);
+    backdrop-filter: blur(10px);
+  }
+  
+  .text-gradient {
+    background: var(--gradient-accent);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  
+  .glow-effect {
+    box-shadow: var(--shadow-glow);
+  }
+  
+  .smooth-transition {
+    transition: var(--transition-smooth);
+  }
+  
+  .bounce-transition {
+    transition: var(--transition-bounce);
+  }
+  
+  /* Animated underline effect for links */
+  .link-underline {
+    @apply relative;
+  }
+  
+  .link-underline::after {
+    content: '';
+    @apply absolute bottom-0 left-0 w-full h-0.5 bg-primary scale-x-0 origin-right;
+    transition: transform 0.3s ease-out;
+  }
+  
+  .link-underline:hover::after {
+    @apply scale-x-100 origin-left;
+  }
+  
+  /* Floating animation */
+  .float-animation {
+    animation: float 6s ease-in-out infinite;
+  }
+  
+  @keyframes float {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-20px); }
+  }
+  
+  /* Pulse animation for accent elements */
+  .pulse-accent {
+    animation: pulse-accent 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  }
+  
+  @keyframes pulse-accent {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.7; }
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+  }
+}
