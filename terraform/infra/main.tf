@@ -10,10 +10,10 @@ data "aws_vpc" "main" {
 # Security Group Module - Create first
 module "security_groups" {
   source = "../modules/04-CloudFront-Security-Group"
-  
+
   name_prefix = "resume-webapp"
-  vpc_id     = data.aws_vpc.main.id
-  tags       = var.tags
+  vpc_id      = data.aws_vpc.main.id
+  tags        = var.tags
 }
 
 # S3 Module - Create after security groups

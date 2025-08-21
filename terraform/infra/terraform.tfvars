@@ -13,7 +13,7 @@ enable_logging      = false # Enable CloudFront access logging (increases costs)
 enable_health_check = true  # Enable Route53 health checks for monitoring
 
 # VPC Configuration
-vpc_id = "vpc-0e1753c29d98965f5"  # Default VPC for the resume website
+vpc_id = "vpc-0e1753c29d98965f5" # Default VPC for the resume website
 
 # AWS Region and Cost Settings
 aws_region             = "us-east-1"

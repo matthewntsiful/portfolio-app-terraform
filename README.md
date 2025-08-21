@@ -43,11 +43,61 @@ resume-webapp-terraform/
         └── error.html
 ```
 
-## Implementation Details
+## Security Implementation
 
-### S3 Bucket Security
-- Configured with Origin Access Identity (OAI) for CloudFront access
-- All public access blocked at bucket level
+### CloudFront Security
+- **Web Application Firewall (WAF)** enabled with AWS Managed Rules
+- **HTTPS Enforcement** with TLS 1.2+ required
+- **Origin Access Control (OAC)** for secure S3 origin access
+- **AWS Shield Standard** for DDoS protection
+
+### S3 Security
+- **Origin Access Control (OAC)** for CloudFront access
+- **Block all public access** enabled
+- **Server-side encryption** with Amazon S3-managed keys (SSE-S3)
+- **Bucket policy** restricts access to CloudFront distribution only
+- Versioning enabled for data recovery
+
+### WAF Protection
+- **Rate-based rules**: Prevents DDoS attacks
+- **AWS Managed Rules**:
+  - Core rule set (CRS) for common web exploits
+  - Known bad inputs rule set
+  - IP reputation list
+  - Anonymous IP list
+
+### IAM & Authentication
+- OIDC integration with GitHub Actions
+- Least privilege IAM roles
+- No hardcoded credentials
+
+## Architecture Decisions
+
+### S3 Bucket Policies
+- **CloudFront OAI**: Configured to allow access only through CloudFront using Origin Access Identity
+- **Block Public Access**: Enabled to prevent accidental public exposure
+- **Bucket Policy**: Restricts `s3:GetObject` to CloudFront distribution only
+
+### CloudFront Caching
+- **Static Assets**: 1-year cache TTL with versioned filenames
+- **HTML Content**: 1-hour cache TTL with cache invalidation on deploy
+- **Query String Forwarding**: Enabled for cache busting
+- **Compression**: Gzip and Brotli enabled for all compressible content
+
+### DNS Configuration (Route53)
+- **Apex Domain**: ALIAS record pointing to CloudFront distribution
+- **www Subdomain**: CNAME record to support www.matthewntsiful.com
+- **SSL Certificates**: Managed by ACM with automatic renewal
+- **Health Checks**: Configured for monitoring endpoint availability
+
+### WAF Protection Rules
+1. **Rate Limiting**: 2000 requests per 5-minute window per IP
+2. **AWS Managed Rules**:
+   - Core Rule Set (CRS) for OWASP Top 10 protection
+   - Known Bad Inputs
+   - IP Reputation List
+   - Anonymous IP List
+3. **Geo-Restriction**: Optional country-based access control
 - Server-side encryption enabled for data at rest
 - Bucket policies restrict access to CloudFront distribution only
 - Versioning enabled for data recovery
@@ -190,19 +240,6 @@ resume-webapp-terraform/
 - Handles domain verification
 - Configures health checks
 
-        /
-├── index.html
-├── error.html
-├── css/
-│   └── styles.css
-├── js/
-│   └── app.js
-├── assets/
-│   ├── icons/
-│   └── images/
-│       └── README.md
-└── README.md
-
 ## Maintenance
 - **Version Control**: All infrastructure code is version controlled
 - **Updates**: Update variables in `terraform.tfvars` and apply changes
@@ -214,6 +251,92 @@ resume-webapp-terraform/
 - AWS CLI configured
 - AWS account with appropriate permissions
 - Registered domain (optional)
+
+## CI/CD Pipelines
+
+### 1. Terraform CI/CD Pipeline
+
+**Triggered when:**
+- Pushes to `main`, `devops-engineers`, or `web-developers` branches
+- Changes in `terraform/**` directory
+- Manual trigger via GitHub Actions
+
+**Workflow:**
+1. **Plan Stage**
+   - Validates Terraform configuration
+   - Generates execution plan
+   - Posts plan as a PR comment (for PRs)
+
+2. **Apply Stage** (Manual approval for production)
+   - Applies infrastructure changes
+   - Runs `terraform apply`
+   - Handles state locking
+
+3. **Destroy Stage** (Manual trigger only)
+   - Safely destroys resources when needed
+
+### 2. Website Deployment Pipeline
+
+**Triggered when:**
+- Pushes to `main`, `devops-engineers`, or `web-developers` branches
+- Changes in `website/**` directory
+- Manual trigger via GitHub Actions
+
+**Features:**
+- Automated S3 deployment
+- CloudFront cache invalidation
+- Environment-based deployment (staging/production)
+- Rollback support
+
+### Deployment Environments
+
+| Environment | Branch       | Auto-Deploy | Manual Approval |
+|-------------|--------------|-------------|-----------------|
+| Staging    | web-developers | ✅ Yes      | ❌ No           |
+| Production | main         | ❌ No       | ✅ Yes          |
+
+### Authentication
+This project uses GitHub's OIDC provider to authenticate with AWS, eliminating the need for long-term access keys.
+
+#### Required GitHub Secrets:
+- `AWS_ROLE_ARN`: The ARN of the IAM role to assume
+- `CLOUDFRONT_DISTRIBUTION_ID`: For cache invalidation
+
+#### Required IAM Configuration:
+1. Create an IAM Identity Provider for GitHub Actions
+2. Configure the IAM role with a trust policy for GitHub's OIDC provider
+3. Attach necessary permissions to the IAM role
+
+## Deliverables Status
+
+### Infrastructure
+- [x] Terraform configuration for all AWS resources
+- [x] Multi-environment support (staging/production)
+- [x] Secure S3 bucket configuration
+- [x] CloudFront distribution with WAF
+- [x] Route53 DNS configuration
+- [x] Automated SSL certificate management
+
+### CI/CD Pipeline
+- [x] GitHub Actions workflow for infrastructure
+- [x] GitHub Actions workflow for website deployment
+- [x] OIDC authentication for AWS
+- [x] Automated testing and validation
+- [x] Deployment approval gates for production
+
+### Security
+- [x] WAF rules for OWASP Top 10 protection
+- [x] Rate limiting and DDoS protection
+- [x] Secure IAM roles with least privilege
+- [x] No hardcoded credentials
+- [x] Infrastructure as Code best practices
+
+### Documentation
+- [x] Architecture diagram
+- [x] Setup and deployment instructions
+- [x] Security considerations
+- [x] Troubleshooting guide
+- [ ] Performance benchmarks
 
 ## License
 [Your License Here]

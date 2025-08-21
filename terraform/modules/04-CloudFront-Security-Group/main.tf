@@ -7,7 +7,7 @@ resource "aws_security_group" "cloudfront_sg" {
   name        = "${var.name_prefix}-cloudfront-sg"
   description = "Security group for CloudFront distribution"
   vpc_id      = var.vpc_id
-  
+
   # Allow HTTPS (port 443) from anywhere
   ingress {
     from_port   = 443
