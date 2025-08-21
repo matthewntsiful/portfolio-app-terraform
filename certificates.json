@@ -1,0 +1,58 @@
+{
+    "CertificateSummaryList": [
+        {
+            "CertificateArn": "arn:aws:acm:us-east-1:011921741878:certificate/4dc2f06a-5c04-48c4-b833-0de1d371bfc5",
+            "DomainName": "matthewntsiful.com",
+            "SubjectAlternativeNameSummaries": [
+                "matthewntsiful.com",
+                "www.matthewntsiful.com"
+            ],
+            "HasAdditionalSubjectAlternativeNames": false,
+            "Status": "ISSUED",
+            "Type": "AMAZON_ISSUED",
+            "KeyAlgorithm": "RSA-2048",
+            "KeyUsages": [
+                "DIGITAL_SIGNATURE",
+                "KEY_ENCIPHERMENT"
+            ],
+            "ExtendedKeyUsages": [
+                "TLS_WEB_SERVER_AUTHENTICATION"
+            ],
+            "ExportOption": "DISABLED",
+            "InUse": false,
+            "Exported": false,
+            "RenewalEligibility": "INELIGIBLE",
+            "NotBefore": "2025-08-20T00:00:00+00:00",
+            "NotAfter": "2026-09-18T23:59:59+00:00",
+            "CreatedAt": "2025-08-20T20:28:53.600000+00:00",
+            "IssuedAt": "2025-08-20T20:29:19.719000+00:00"
+        },
+        {
+            "CertificateArn": "arn:aws:acm:us-east-1:011921741878:certificate/8fd2ae9e-7a0e-4805-83e6-be2a313179a8",
+            "DomainName": "matthewntsiful.com",
+            "SubjectAlternativeNameSummaries": [
+                "matthewntsiful.com",
+                "www.matthewntsiful.com"
+            ],
+            "HasAdditionalSubjectAlternativeNames": false,
+            "Status": "ISSUED",
+            "Type": "AMAZON_ISSUED",
+            "KeyAlgorithm": "RSA-2048",
+            "KeyUsages": [
+                "DIGITAL_SIGNATURE",
+                "KEY_ENCIPHERMENT"
+            ],
+            "ExtendedKeyUsages": [
+                "TLS_WEB_SERVER_AUTHENTICATION"
+            ],
+            "ExportOption": "DISABLED",
+            "InUse": true,
+            "Exported": false,
+            "RenewalEligibility": "ELIGIBLE",
+            "NotBefore": "2025-08-20T00:00:00+00:00",
+            "NotAfter": "2026-09-18T23:59:59+00:00",
+            "CreatedAt": "2025-08-20T21:02:36.037000+00:00",
+            "IssuedAt": "2025-08-20T21:02:55.116000+00:00"
+        }
+    ]
+}

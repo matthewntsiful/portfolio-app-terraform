@@ -1,0 +1,89 @@
+{
+    "ResourceRecordSets": [
+        {
+            "Name": "matthewntsiful.com.",
+            "Type": "A",
+            "AliasTarget": {
+                "HostedZoneId": "Z2FDTNDATAQYW2",
+                "DNSName": "d2xk4siiky4aur.cloudfront.net.",
+                "EvaluateTargetHealth": false
+            }
+        },
+        {
+            "Name": "matthewntsiful.com.",
+            "Type": "AAAA",
+            "AliasTarget": {
+                "HostedZoneId": "Z2FDTNDATAQYW2",
+                "DNSName": "d2xk4siiky4aur.cloudfront.net.",
+                "EvaluateTargetHealth": false
+            }
+        },
+        {
+            "Name": "matthewntsiful.com.",
+            "Type": "NS",
+            "TTL": 172800,
+            "ResourceRecords": [
+                {
+                    "Value": "ns-980.awsdns-58.net."
+                },
+                {
+                    "Value": "ns-1831.awsdns-36.co.uk."
+                },
+                {
+                    "Value": "ns-378.awsdns-47.com."
+                },
+                {
+                    "Value": "ns-1534.awsdns-63.org."
+                }
+            ]
+        },
+        {
+            "Name": "matthewntsiful.com.",
+            "Type": "SOA",
+            "TTL": 900,
+            "ResourceRecords": [
+                {
+                    "Value": "ns-980.awsdns-58.net. awsdns-hostmaster.amazon.com. 1 7200 900 1209600 86400"
+                }
+            ]
+        },
+        {
+            "Name": "_95d1a0f7e1c93ec08996a40b6df90ee8.matthewntsiful.com.",
+            "Type": "CNAME",
+            "TTL": 60,
+            "ResourceRecords": [
+                {
+                    "Value": "_27deea50985a23918ac7d5408945a733.xlfgrmvvlj.acm-validations.aws."
+                }
+            ]
+        },
+        {
+            "Name": "www.matthewntsiful.com.",
+            "Type": "A",
+            "AliasTarget": {
+                "HostedZoneId": "Z2FDTNDATAQYW2",
+                "DNSName": "d2xk4siiky4aur.cloudfront.net.",
+                "EvaluateTargetHealth": false
+            }
+        },
+        {
+            "Name": "www.matthewntsiful.com.",
+            "Type": "AAAA",
+            "AliasTarget": {
+                "HostedZoneId": "Z2FDTNDATAQYW2",
+                "DNSName": "d2xk4siiky4aur.cloudfront.net.",
+                "EvaluateTargetHealth": false
+            }
+        },
+        {
+            "Name": "_5bca7e2ccd86df3c39abcb70c123f6fa.www.matthewntsiful.com.",
+            "Type": "CNAME",
+            "TTL": 60,
+            "ResourceRecords": [
+                {
+                    "Value": "_13187127f90db55b53fb6a5642f0caee.xlfgrmvvlj.acm-validations.aws."
+                }
+            ]
+        }
+    ]
+}

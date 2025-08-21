@@ -42,3 +42,7 @@ terraform.rc
 
 # Ignore .terraform directory in all subdirectories
 **/.terraform/*
+
+# Ignore JSON files
+*.json
+!*.tf.json
