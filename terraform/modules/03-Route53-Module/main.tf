@@ -83,9 +83,9 @@ resource "aws_route53_health_check" "main" {
   port                            = 443
   type                            = "HTTPS"
   resource_path                   = "/"
-  failure_threshold               = 3
+  failure_threshold               = 5
   request_interval                = 30
-  insufficient_data_health_status = "LastKnownStatus" # FIXED: was "Failure"
+  #insufficient_data_health_status = "LastKnownStatus" # FIXED: was "Failure"
 
   tags = merge(local.common_tags, {
     Name = format("%s-%s-health-check", local.name_prefix, local.suffix)

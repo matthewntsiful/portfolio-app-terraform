@@ -66,9 +66,9 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "webapp_bucket" {
 }
 
 # Bucket policy allowing CloudFront access
+# In your S3 module main.tf
 resource "aws_s3_bucket_policy" "webapp_bucket" {
   bucket = aws_s3_bucket.webapp_bucket.id
-
   policy = jsonencode({
     Version = "2012-10-17"
     Statement = [
@@ -82,7 +82,7 @@ resource "aws_s3_bucket_policy" "webapp_bucket" {
         Resource = "${aws_s3_bucket.webapp_bucket.arn}/*"
         Condition = {
           StringEquals = {
-            "AWS:SourceArn" = "arn:aws:cloudfront::${data.aws_caller_identity.current.account_id}:distribution/*"
+            "AWS:SourceArn" = var.cloudfront_distribution_arn != "" ? var.cloudfront_distribution_arn : "arn:aws:cloudfront::${data.aws_caller_identity.current.account_id}:distribution/*"
           }
         }
       }
@@ -90,6 +90,7 @@ resource "aws_s3_bucket_policy" "webapp_bucket" {
   })
 }
 
+# Add this data source if not already present
 data "aws_caller_identity" "current" {}
 
 # Lifecycle configuration for cost optimization - FIXED NONCURRENT_DAYS

@@ -8,6 +8,7 @@ module "s3" {
 
   domain_name       = var.domain_name
   lifecycle_enabled = var.lifecycle_enabled
+  cloudfront_distribution_arn = module.cloudfront.distribution_arn
 }
 
 # Route53 Module - Create second (needed for certificate validation)
@@ -41,3 +42,30 @@ module "cloudfront" {
   cloudfront_price_class    = var.cloudfront_price_class
   hosted_zone_id            = module.route53.hosted_zone_id
 }
+
+
+# # In your root main.tf, add this after the modules:
+# resource "aws_s3_bucket_policy" "webapp_bucket_policy_update" {
+#   depends_on = [module.cloudfront]
+  
+#   bucket = module.s3.bucket_name
+#   policy = jsonencode({
+#     Version = "2012-10-17"
+#     Statement = [
+#       {
+#         Sid    = "AllowCloudFrontServicePrincipal"
+#         Effect = "Allow"
+#         Principal = {
+#           Service = "cloudfront.amazonaws.com"
+#         }
+#         Action   = "s3:GetObject"
+#         Resource = "${module.s3.bucket_arn}/*"
+#         Condition = {
+#           StringEquals = {
+#             "AWS:SourceArn" = module.cloudfront.distribution_arn
+#           }
+#         }
+#       }
+#     ]
+#   })
+# }

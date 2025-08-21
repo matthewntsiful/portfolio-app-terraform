@@ -32,7 +32,7 @@ variable "lifecycle_enabled" {
 variable "enable_logging" {
   description = "Enable CloudFront access logging (creates additional S3 bucket and costs)"
   type        = bool
-  default     = false
+  default     = true
 }
 
 variable "enable_health_check" {

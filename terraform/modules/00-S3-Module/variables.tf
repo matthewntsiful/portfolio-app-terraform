@@ -12,3 +12,10 @@ variable "lifecycle_enabled" {
   type        = bool
   default     = true
 }
+
+# variables.tf in S3 module
+variable "cloudfront_distribution_arn" {
+  description = "ARN of the CloudFront distribution for bucket policy"
+  type        = string
+  default     = ""
+}
