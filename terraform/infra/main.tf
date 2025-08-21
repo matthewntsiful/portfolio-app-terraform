@@ -6,8 +6,8 @@
 module "s3" {
   source = "../modules/00-S3-Module"
 
-  domain_name       = var.domain_name
-  lifecycle_enabled = var.lifecycle_enabled
+  domain_name                 = var.domain_name
+  lifecycle_enabled           = var.lifecycle_enabled
   cloudfront_distribution_arn = module.cloudfront.distribution_arn
 }
 
@@ -47,7 +47,7 @@ module "cloudfront" {
 # # In your root main.tf, add this after the modules:
 # resource "aws_s3_bucket_policy" "webapp_bucket_policy_update" {
 #   depends_on = [module.cloudfront]
-  
+
 #   bucket = module.s3.bucket_name
 #   policy = jsonencode({
 #     Version = "2012-10-17"
