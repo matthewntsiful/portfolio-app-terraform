@@ -1,4 +1,4 @@
-# Resume Website with AWS Infrastructure
+# Portfolio Website with AWS Infrastructure
 
 [![AWS](https://img.shields.io/badge/AWS-%23FF9900.svg?style=for-the-badge&logo=amazon-aws&logoColor=white)](https://aws.amazon.com/)
 [![Terraform](https://img.shields.io/badge/terraform-%235835CC.svg?style=for-the-badge&logo=terraform&logoColor=white)](https://www.terraform.io/)
@@ -11,15 +11,24 @@
 ## 🚀 Live Demo
 
 Access the website using either URL:
-- [https://matthewntsiful.com](https://matthewntsiful.com) (Root domain)
-- [https://www.matthewntsiful.com](https://www.matthewntsiful.com) (www subdomain)
+
+- [matthewntsiful.com](https://matthewntsiful.com) (Root domain)
+- [www.matthewntsiful.com](https://www.matthewntsiful.com) (www subdomain)
 
 Both URLs are configured with HTTPS and will redirect to ensure a secure connection.
 
 ## Project Overview
-A secure, high-performance personal resume website deployed on AWS infrastructure using S3, CloudFront, Route53, and WAF. This project demonstrates modern cloud architecture practices for hosting static websites with enterprise-grade security and performance.
 
-## Architecture
+A secure, high-performance portfolio website deployed on AWS infrastructure using S3, CloudFront, Route53, and WAF. This project showcases my work and demonstrates modern cloud architecture practices for hosting static websites with enterprise-grade security and performance.
+
+## 🖼️ Portfolio Features
+
+- **Project Showcase**: Highlighting key projects with descriptions and technologies used
+- **Responsive Design**: Optimized for all device sizes
+- **Performance Optimized**: Lightning-fast loading times with CloudFront CDN
+- **Contact Section**: Easy way to get in touch
+
+## 🏗️ Architecture
 
 ![Architecture Diagram](diagrams/architecture.png)
 
@@ -46,12 +55,14 @@ resume-webapp-terraform/
 ## Security Implementation
 
 ### CloudFront Security
+
 - **Web Application Firewall (WAF)** enabled with AWS Managed Rules
 - **HTTPS Enforcement** with TLS 1.2+ required
 - **Origin Access Control (OAC)** for secure S3 origin access
 - **AWS Shield Standard** for DDoS protection
 
 ### S3 Security
+
 - **Origin Access Control (OAC)** for CloudFront access
 - **Block all public access** enabled
 - **Server-side encryption** with Amazon S3-managed keys (SSE-S3)
@@ -59,32 +70,41 @@ resume-webapp-terraform/
 - Versioning enabled for data recovery
 
 ### WAF Protection
-- **Rate-based rules**: Prevents DDoS attacks
-- **AWS Managed Rules**:
-  - Core rule set (CRS) for common web exploits
-  - Known bad inputs rule set
-  - IP reputation list
-  - Anonymous IP list
 
-### IAM & Authentication
-- OIDC integration with GitHub Actions
-- Least privilege IAM roles
-- No hardcoded credentials
+#### Rate-based Rules
+
+- Prevents DDoS attacks
+
+#### AWS Managed Rules
+
+- Core rule set (CRS) for common web exploits
+- Known bad inputs
+- IP reputation list
+- Anonymous IP list
+
+### DDoS Protection
+
+- **AWS Shield Standard** (included with AWS)
+- **Rate limiting** at the WAF level
+- **Geographic restrictions** available if needed
 
 ## Architecture Decisions
 
 ### S3 Bucket Policies
+
 - **CloudFront OAI**: Configured to allow access only through CloudFront using Origin Access Identity
 - **Block Public Access**: Enabled to prevent accidental public exposure
 - **Bucket Policy**: Restricts `s3:GetObject` to CloudFront distribution only
 
 ### CloudFront Caching
+
 - **Static Assets**: 1-year cache TTL with versioned filenames
 - **HTML Content**: 1-hour cache TTL with cache invalidation on deploy
 - **Query String Forwarding**: Enabled for cache busting
 - **Compression**: Gzip and Brotli enabled for all compressible content
 
 ### DNS Configuration (Route53)
+
 - **Apex Domain**: ALIAS record pointing to CloudFront distribution
 - **www Subdomain**: CNAME record to support www.matthewntsiful.com
 - **SSL Certificates**: Managed by ACM with automatic renewal
