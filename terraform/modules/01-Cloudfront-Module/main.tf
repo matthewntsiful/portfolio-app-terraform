@@ -119,7 +119,7 @@ resource "aws_cloudfront_distribution" "main" {
     domain_name              = var.s3_bucket_regional_domain
     origin_id                = "S3-${var.domain_name}"
     origin_access_control_id = var.origin_access_control_id
-    
+
   }
 
   # Logging configuration - properly structured
