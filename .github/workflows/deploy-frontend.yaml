@@ -115,16 +115,26 @@ jobs:
     if: always()
     runs-on: ubuntu-latest
     steps:
+      - name: Determine status
+        id: status
+        run: |
+          if echo '${{ toJSON(needs) }}' | grep -q '"result":"failure"'; then
+            echo "status=❌ Failed" >> $GITHUB_OUTPUT
+            echo "color=#ff0000" >> $GITHUB_OUTPUT
+          else
+            echo "status=✅ Succeeded" >> $GITHUB_OUTPUT
+            echo "color=#36a64f" >> $GITHUB_OUTPUT
+          fi
+
       - name: Send Slack notification
         uses: rtCamp/action-slack-notify@v2
         env:
           SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK_URL }}
-          SLACK_COLOR: ${{ contains(needs.*.result, 'failure') && '#ff0000' || '#36a64f' }}
-          SLACK_TITLE: 'Frontend Pipeline ${{ contains(needs.*.result, 'failure') && 'Failed' || 'Succeeded' }}'
+          SLACK_COLOR: ${{ steps.status.outputs.color }}
+          SLACK_TITLE: "Frontend Pipeline ${{ steps.status.outputs.status == '✅ Succeeded' && 'Succeeded' || 'Failed' }}"
           SLACK_MESSAGE: |
             *Workflow*: ${{ github.workflow }}
-            *Status*: ${{ contains(needs.*.result, 'failure') && '❌ Failed' || '✅ Succeeded' }}
+            *Status*: ${{ steps.status.outputs.status }}
             *Commit*: ${{ github.sha }}
             *Branch*: ${{ github.ref_name }}
             *Run*: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
-          MSG_MINIMAL: false
