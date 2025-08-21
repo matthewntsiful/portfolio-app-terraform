@@ -1,10 +1,8 @@
-# Workflow triggered at 2025-08-21 15:53
-name: Deploy Frontend to S3 and CloudFront
+name: Frontend CI/CD Pipeline
 
 on:
   push:
     branches: [main]
-    # Only trigger when frontend files change
     paths:
       - 'frontend/**'
       - '.github/workflows/deploy-frontend.yml'
@@ -16,20 +14,21 @@ env:
 
 jobs:
   test:
+    name: Run Tests
     runs-on: ubuntu-latest
     defaults:
       run:
         working-directory: ${{ env.FRONTEND_DIR }}
-        
+    
     steps:
-      - uses: actions/checkout@v3
+      - name: Checkout code
+        uses: actions/checkout@v3
       
-      - name: Set up Node.js
+      - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
           node-version: 18
           cache: 'npm'
-          cache-dependency-path: ${{ env.FRONTEND_DIR }}/package-lock.json
       
       - name: Install dependencies
         run: npm ci
@@ -37,51 +36,95 @@ jobs:
       - name: Run tests
         run: npm test
 
-  deploy:
+  build:
+    name: Build Project
     needs: test
     runs-on: ubuntu-latest
-    permissions:
-      id-token: write
-      contents: read
-      
+    outputs:
+      build-complete: ${{ steps.build.outputs.build-complete }}
+    
     defaults:
       run:
         working-directory: ${{ env.FRONTEND_DIR }}
-        
+    
     steps:
-      - uses: actions/checkout@v3
+      - name: Checkout code
+        uses: actions/checkout@v3
       
-      - name: Set up Node.js
+      - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
           node-version: 18
           cache: 'npm'
-          cache-dependency-path: ${{ env.FRONTEND_DIR }}/package-lock.json
       
       - name: Install dependencies
         run: npm ci
       
       - name: Build project
-        run: npm run build
+        id: build
+        run: |
+          npm run build
+          echo "build-complete=true" >> $GITHUB_OUTPUT
       
-      - name: Configure AWS credentials using OIDC
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: frontend-build
+          path: ${{ env.FRONTEND_DIR }}/dist
+          retention-days: 1
+
+  deploy:
+    name: Deploy to AWS
+    needs: build
+    if: needs.build.result == 'success'
+    runs-on: ubuntu-latest
+    environment: production
+    
+    permissions:
+      id-token: write
+      contents: read
+    
+    steps:
+      - name: Download build artifacts
+        uses: actions/download-artifact@v3
+        with:
+          name: frontend-build
+          path: ${{ env.FRONTEND_DIR }}/dist
+      
+      - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v2
         with:
           role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
           aws-region: ${{ env.AWS_REGION }}
       
       - name: Deploy to S3
-        run: aws s3 sync dist/ s3://${{ secrets.AWS_S3_BUCKET }} --delete
+        run: |
+          aws s3 sync ${{ env.FRONTEND_DIR }}/dist/ s3://${{ secrets.AWS_S3_BUCKET }} \
+            --delete \
+            --cache-control "public, max-age=31536000"
       
       - name: Invalidate CloudFront cache
-        run: aws cloudfront create-invalidation --distribution-id ${{ secrets.AWS_CLOUDFRONT_DISTRIBUTION_ID }} --paths "/*"
-      
+        run: |
+          aws cloudfront create-invalidation \
+            --distribution-id ${{ secrets.AWS_CLOUDFRONT_DISTRIBUTION_ID }} \
+            --paths "/*"
+
+  notify:
+    name: Notify Status
+    needs: [test, build, deploy]
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
       - name: Send Slack notification
-        if: always()
         uses: rtCamp/action-slack-notify@v2
         env:
           SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK_URL }}
-          SLACK_COLOR: ${{ job.status == 'success' && '#36a64f' || '#ff0000' }}
-          SLACK_TITLE: 'Frontend Deployment ${{ job.status }}'
-          SLACK_MESSAGE: 'Deployment to ${{ secrets.AWS_S3_BUCKET }} ${{ job.status }}'
-          MSG_MINIMAL: true
+          SLACK_COLOR: ${{ contains(needs.*.result, 'failure') && '#ff0000' || '#36a64f' }}
+          SLACK_TITLE: 'Frontend Pipeline ${{ contains(needs.*.result, 'failure') && 'Failed' || 'Succeeded' }}'
+          SLACK_MESSAGE: |
+            *Workflow*: ${{ github.workflow }}
+            *Status*: ${{ contains(needs.*.result, 'failure') && '❌ Failed' || '✅ Succeeded' }}
+            *Commit*: ${{ github.sha }}
+            *Branch*: ${{ github.ref_name }}
+            *Run*: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+          MSG_MINIMAL: false
