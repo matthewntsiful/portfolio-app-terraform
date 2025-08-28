@@ -33,6 +33,9 @@ jobs:
     name: Deploy Website
     runs-on: ubuntu-latest
     environment: ${{ contains(github.ref, 'main') && 'production' || 'staging' }}
+    outputs:
+      bucket-name: ${{ steps.deploy-step.outputs.bucket-name }}
+      cloudfront-url: ${{ steps.invalidate-step.outputs.cloudfront-url }}
     
     steps:
     - name: Checkout code
@@ -53,42 +56,66 @@ jobs:
         aws --version
 
     - name: Deploy to S3
+      id: deploy-step
       if: github.event.inputs.action != 'invalidate-cache'
       working-directory: website
       run: |
         BUCKET_NAME="${{ secrets.S3_BUCKET_NAME }}"
-        CACHE_CONTROL="public, max-age=31536000"
         
-        # Sync files to S3 with appropriate settings
+        # Sync HTML files with no cache for fresh content
         aws s3 sync . s3://$BUCKET_NAME \
           --delete \
-          --cache-control "$CACHE_CONTROL" \
+          --cache-control "no-cache, no-store, must-revalidate" \
           --exclude "*" \
-          --include "*.html" --include "*.css" --include "*.js" \
+          --include "*.html"
+        
+        # Sync static assets with long cache
+        aws s3 sync . s3://$BUCKET_NAME \
+          --cache-control "public, max-age=31536000" \
+          --exclude "*.html" \
+          --include "*.css" --include "*.js" \
           --include "*.png" --include "*.jpg" --include "*.jpeg" --include "*.gif" \
           --include "*.svg" --include "*.ico" --include "*.json"
         
-        # Sync assets with different cache settings
-        aws s3 sync . s3://$BUCKET_NAME \
-          --delete \
-          --cache-control "public, max-age=86400" \
-          --exclude "*" \
-          --include "assets/*" \
-          --include "css/*" \
-          --include "js/*"
+        # Sync assets directories with medium cache
+        if [ -d "assets" ] || [ -d "css" ] || [ -d "js" ]; then
+          aws s3 sync . s3://$BUCKET_NAME \
+            --cache-control "public, max-age=86400" \
+            --exclude "*" \
+            --include "assets/*" \
+            --include "css/*" \
+            --include "js/*"
+        fi
         
-        echo "BUCKET_NAME=$BUCKET_NAME" >> $GITHUB_ENV
+        echo "bucket-name=$BUCKET_NAME" >> $GITHUB_OUTPUT
+        echo "Website uploaded to S3 bucket: $BUCKET_NAME"
 
     - name: Invalidate CloudFront Cache
-      if: github.event.inputs.action != 'deploy' || github.event_name == 'push'
+      id: invalidate-step
+      if: github.event.inputs.action == 'invalidate-cache' || github.event_name == 'push' || github.event.inputs.action == 'deploy'
       run: |
-        aws cloudfront create-invalidation \
-          --distribution-id ${{ secrets.CLOUDFRONT_DISTRIBUTION_ID }} \
-          --paths "/*"
+        DISTRIBUTION_ID="${{ secrets.CLOUDFRONT_DISTRIBUTION_ID }}"
         
-        CLOUDFRONT_URL=$(aws cloudfront get-distribution --id ${{ secrets.CLOUDFRONT_DISTRIBUTION_ID }} --query 'Distribution.DomainName' --output text)
-        echo "CLOUDFRONT_URL=$CLOUDFRONT_URL" >> $GITHUB_ENV
-        echo "Website deployed to: https://${{ env.BUCKET_NAME }}.s3-website-${{ env.AWS_REGION }}.amazonaws.com"
+        if [ -n "$DISTRIBUTION_ID" ]; then
+          echo "Creating CloudFront invalidation..."
+          INVALIDATION_ID=$(aws cloudfront create-invalidation \
+            --distribution-id $DISTRIBUTION_ID \
+            --paths "/*" \
+            --query 'Invalidation.Id' \
+            --output text)
+          
+          echo "Invalidation created with ID: $INVALIDATION_ID"
+          
+          CLOUDFRONT_URL=$(aws cloudfront get-distribution \
+            --id $DISTRIBUTION_ID \
+            --query 'Distribution.DomainName' \
+            --output text)
+          
+          echo "cloudfront-url=$CLOUDFRONT_URL" >> $GITHUB_OUTPUT
+          echo "CloudFront URL: https://$CLOUDFRONT_URL"
+        else
+          echo "No CloudFront distribution ID provided, skipping invalidation"
+        fi
 
   notify:
     name: 'Notify Deployment Status'
@@ -101,29 +128,37 @@ jobs:
       run: |
         if [[ "${{ needs.deploy.result }}" == "success" ]]; then
           echo "status=success" >> $GITHUB_OUTPUT
+          echo "emoji=✅" >> $GITHUB_OUTPUT
         else
           echo "status=failure" >> $GITHUB_OUTPUT
+          echo "emoji=❌" >> $GITHUB_OUTPUT
         fi
 
     - name: Send Slack Notification
+      if: vars.SLACK_NOTIFICATIONS_ENABLED == 'true'
       uses: rtCamp/action-slack-notify@v2
       env:
-        SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
+        SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK_URL }}
         SLACK_COLOR: ${{ steps.check_status.outputs.status == 'success' && 'good' || 'danger' }}
-        SLACK_TITLE: "Deployment ${{ steps.check_status.outputs.status == 'success' && 'Succeeded' || 'Failed' }}"
+        SLACK_TITLE: "Website Deployment ${{ steps.check_status.outputs.status == 'success' && 'Succeeded' || 'Failed' }}"
         SLACK_MESSAGE: |
-          *Environment*: ${{ contains(github.ref, 'main') && 'Production' || 'Staging' }}
-          *Action*: ${{ github.event.inputs.action || 'deploy' }}
-          *Status*: ${{ steps.check_status.outputs.status == 'success' && '✅ Success' || '❌ Failed' }}
-          *Triggered by*: ${{ github.actor }}
-          *Run URL*: <${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}|View Run>
+          ${{ steps.check_status.outputs.emoji }} **Deployment Status**: ${{ steps.check_status.outputs.status == 'success' && 'SUCCESS' || 'FAILED' }}
           
-          *AWS Region*: ${{ env.AWS_REGION }}
-          *S3 Bucket*: ${{ env.BUCKET_NAME || 'N/A' }}
-          ${{ env.CLOUDFRONT_URL && format('*CloudFront*: {0}', env.CLOUDFRONT_URL) || '' }}
+          **Details:**
+          • *Environment*: ${{ contains(github.ref, 'main') && 'Production' || 'Staging' }}
+          • *Action*: ${{ github.event.inputs.action || 'deploy' }}
+          • *Triggered by*: ${{ github.actor }}
+          • *Branch*: `${{ github.ref_name }}`
+          • *Commit*: `${{ github.sha }}`
           
-          *Commit*: `${{ github.sha }}`
-          *Branch*: `${{ github.ref_name }}`
-        SLACK_USERNAME: GitHub Actions
+          **Infrastructure:**
+          • *AWS Region*: ${{ env.AWS_REGION }}
+          • *S3 Bucket*: ${{ needs.deploy.outputs.bucket-name || 'N/A' }}
+          ${{ needs.deploy.outputs.cloudfront-url && format('• *CloudFront*: https://{0}', needs.deploy.outputs.cloudfront-url) || '• *CloudFront*: Not configured' }}
+          
+          **Links:**
+          • <${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}|View Workflow Run>
+          ${{ needs.deploy.outputs.bucket-name && format('• <https://{0}.s3-website-{1}.amazonaws.com|S3 Website>', needs.deploy.outputs.bucket-name, env.AWS_REGION) || '' }}
+        SLACK_USERNAME: GitHub Actions Bot
         SLACK_ICON: https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png
-        SLACK_FOOTER: "${{ github.workflow }} #${{ github.run_number }}"
+        SLACK_FOOTER: "${{ github.workflow }} #${{ github.run_number }} • ${{ github.repository }}"

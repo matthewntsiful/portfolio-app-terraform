@@ -10,7 +10,7 @@ updates:
       github-actions:
         patterns:
           - "*"
-
+  
   # Maintain Terraform providers
   - package-ecosystem: "terraform"
     directory: "/terraform"
@@ -23,7 +23,7 @@ updates:
           - "*"
     # Allow updates for patch and minor versions
     versioning-strategy: "widen"
-
+  
   # Maintain Terraform module dependencies
   - package-ecosystem: "terraform"
     directory: "/terraform/modules"

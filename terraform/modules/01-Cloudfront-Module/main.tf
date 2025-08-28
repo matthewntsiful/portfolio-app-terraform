@@ -113,13 +113,10 @@ resource "aws_cloudfront_distribution" "main" {
   # Explicitly depend on certificate validation
   depends_on = [aws_acm_certificate_validation.main]
 
-
-
   origin {
     domain_name              = var.s3_bucket_regional_domain
     origin_id                = "S3-${var.domain_name}"
     origin_access_control_id = var.origin_access_control_id
-
   }
 
   # Logging configuration - properly structured
@@ -174,22 +171,20 @@ resource "aws_cloudfront_distribution" "main" {
     minimum_protocol_version = "TLSv1.2_2021"
   }
 
+  # FIXED: Added leading forward slashes to response_page_path
   custom_error_response {
     error_code         = 404
     response_code      = 404
-    response_page_path = "portfolio/404.html"
+    response_page_path = "/portfolio/404.html"  # ✅ Added leading slash
   }
 
   custom_error_response {
     error_code         = 403
     response_code      = 403
-    response_page_path = "portfolio/403.html"
+    response_page_path = "/portfolio/403.html"  # ✅ Added leading slash
   }
 
   tags = merge(local.common_tags, {
     Name = format("%s-%s", local.name_prefix, local.suffix)
   })
 }
-
-
-#####
