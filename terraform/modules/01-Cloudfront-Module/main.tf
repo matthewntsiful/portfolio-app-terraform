@@ -117,6 +117,7 @@ resource "aws_cloudfront_distribution" "main" {
     domain_name              = var.s3_bucket_regional_domain
     origin_id                = "S3-${var.domain_name}"
     origin_access_control_id = var.origin_access_control_id
+    origin_path             = "/portfolio"
   }
 
   # Logging configuration - properly structured
@@ -131,7 +132,7 @@ resource "aws_cloudfront_distribution" "main" {
 
   enabled             = true
   is_ipv6_enabled     = true
-  default_root_object = "portfolio/index.html"
+  default_root_object = "index.html"
   web_acl_id          = var.waf_web_acl_arn
   aliases             = [var.domain_name, "www.${var.domain_name}"]
 
