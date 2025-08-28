@@ -62,30 +62,36 @@ jobs:
       run: |
         BUCKET_NAME="${{ secrets.S3_BUCKET_NAME }}"
         
-        # Sync HTML files with no cache for fresh content
-        aws s3 sync . s3://$BUCKET_NAME \
+        # Sync all files to the portfolio/ prefix in S3
+        aws s3 sync . s3://$BUCKET_NAME/portfolio/ \
           --delete \
           --cache-control "no-cache, no-store, must-revalidate" \
           --exclude "*" \
           --include "*.html"
         
         # Sync static assets with long cache
-        aws s3 sync . s3://$BUCKET_NAME \
+        aws s3 sync . s3://$BUCKET_NAME/portfolio/ \
           --cache-control "public, max-age=31536000" \
           --exclude "*.html" \
           --include "*.css" --include "*.js" \
-          --include "*.png" --include "*.jpg" --include "*.jpeg" --include "*.gif" \
+          --include "*.png" --include "*.jpg" --include "*.jpeg" \
           --include "*.svg" --include "*.ico" --include "*.json"
         
         # Sync assets directories with medium cache
-        if [ -d "assets" ] || [ -d "css" ] || [ -d "js" ]; then
-          aws s3 sync . s3://$BUCKET_NAME \
-            --cache-control "public, max-age=86400" \
-            --exclude "*" \
-            --include "assets/*" \
-            --include "css/*" \
-            --include "js/*"
-        fi
+        aws s3 sync . s3://$BUCKET_NAME/portfolio/ \
+          --cache-control "public, max-age=86400" \
+          --exclude "*" \
+          --include "assets/**" \
+          --include "css/**" \
+          --include "js/**" \
+          --include "styles/**" \
+          --include "components/**"
+        
+        # Set default cache control for any remaining files
+        aws s3 sync . s3://$BUCKET_NAME/portfolio/ \
+          --cache-control "public, max-age=300" \
+          --exclude "*" \
+          --include "*"
         
         echo "bucket-name=$BUCKET_NAME" >> $GITHUB_OUTPUT
         echo "Website uploaded to S3 bucket: $BUCKET_NAME"
