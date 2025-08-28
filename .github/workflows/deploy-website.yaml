@@ -58,7 +58,7 @@ jobs:
     - name: Deploy to S3
       id: deploy-step
       if: github.event.inputs.action != 'invalidate-cache'
-      working-directory: website
+      working-directory: website/portfolio
       run: |
         BUCKET_NAME="${{ secrets.S3_BUCKET_NAME }}"
         
