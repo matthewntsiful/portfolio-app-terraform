@@ -134,7 +134,7 @@ resource "aws_cloudfront_distribution" "main" {
 
   enabled             = true
   is_ipv6_enabled     = true
-  default_root_object = "html/index.html"
+  default_root_object = "portfolio/index.html"
   web_acl_id          = var.waf_web_acl_arn
   aliases             = [var.domain_name, "www.${var.domain_name}"]
 
@@ -177,13 +177,13 @@ resource "aws_cloudfront_distribution" "main" {
   custom_error_response {
     error_code         = 404
     response_code      = 404
-    response_page_path = "/404.html"
+    response_page_path = "portfolio/404.html"
   }
 
   custom_error_response {
     error_code         = 403
     response_code      = 403
-    response_page_path = "/403.html"
+    response_page_path = "portfolio/403.html"
   }
 
   tags = merge(local.common_tags, {
