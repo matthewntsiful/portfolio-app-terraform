@@ -215,4 +215,4 @@ jobs:
           ${{ needs.deploy.outputs.bucket-name && format('• <https://{0}.s3-website-{1}.amazonaws.com|S3 Website>', needs.deploy.outputs.bucket-name, env.AWS_REGION) || '' }}
         SLACK_USERNAME: GitHub Actions Bot
         SLACK_ICON: https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png
-        SLACK_FOOTER: "${{ github.workflow }} #${{ github.run_number }} • ${{ github.repository }}"iiii
+        SLACK_FOOTER: "${{ github.workflow }} #${{ github.run_number }} • ${{ github.repository }}"
