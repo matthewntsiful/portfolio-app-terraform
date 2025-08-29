@@ -1,0 +1,269 @@
+<section id="hero" class="relative min-h-screen flex items-center justify-center overflow-hidden pt-20 pb-20 bg-gradient-to-br from-gray-900 via-gray-900 to-gray-800">
+    <!-- Animated Background Elements -->
+    <div class="absolute inset-0 overflow-hidden">
+        <div class="absolute -top-40 -right-40 w-96 h-96 bg-gradient-to-br from-cyan-500/10 to-transparent rounded-full filter blur-3xl animate-float"></div>
+        <div class="absolute top-1/3 -left-20 w-80 h-80 bg-gradient-to-br from-purple-500/10 to-transparent rounded-full filter blur-3xl animate-float animation-delay-2000"></div>
+        <div class="absolute bottom-20 left-1/4 w-64 h-64 bg-gradient-to-br from-blue-500/10 to-transparent rounded-full filter blur-3xl animate-float animation-delay-4000"></div>
+        <div id="particles-js" class="absolute inset-0 w-full h-full"></div>
+    </div>
+    
+    <!-- Hero Content -->
+    <div class="container mx-auto px-6 z-10 relative">
+        <div class="max-w-4xl mx-auto text-center">
+            <!-- Animated Greeting -->
+            <div class="mb-6">
+                <span class="inline-block px-4 py-2 bg-gradient-to-r from-cyan-500/10 to-blue-500/10 text-cyan-400 text-sm font-medium rounded-full border border-cyan-500/20 mb-6 animate-fadeIn">
+                    <i class="fas fa-code mr-2"></i> Welcome to my portfolio
+                </span>
+            </div>
+            
+            <!-- Main Heading with Animated Gradient -->
+            <h1 class="text-5xl md:text-7xl font-bold mb-6 bg-clip-text text-transparent bg-gradient-to-r from-white via-gray-300 to-gray-500 animate-gradient">
+                Matthew Odoom Ntsiful
+            </h1>
+            
+            <!-- Animated Subtitle -->
+            <div class="relative inline-block mb-8">
+                <h2 class="text-2xl md:text-3xl font-medium bg-clip-text text-transparent bg-gradient-to-r from-cyan-400 via-blue-400 to-indigo-400 animate-gradient-slow">
+                    Cloud & DevOps Engineer
+                </h2>
+                <div class="absolute -bottom-2 left-0 w-full h-1 bg-gradient-to-r from-cyan-500/0 via-cyan-500 to-cyan-500/0 rounded-full"></div>
+            </div>
+            
+            <!-- Animated Typewriter Effect -->
+            <div class="relative mb-10">
+                <div id="typewriter" class="text-xl md:text-2xl text-gray-300 min-h-[2.5rem] md:min-h-[3rem] leading-relaxed"></div>
+                <div class="w-24 h-0.5 bg-gradient-to-r from-cyan-500/0 via-cyan-500 to-cyan-500/0 mx-auto mt-4 rounded-full"></div>
+            </div>
+            
+            <!-- CTA Buttons -->
+            <div class="flex flex-col sm:flex-row justify-center items-center space-y-4 sm:space-y-0 sm:space-x-6 mb-12">
+                <a href="#contact" 
+                   class="group relative overflow-hidden px-8 py-3.5 bg-gradient-to-r from-cyan-600 to-blue-600 text-white font-medium rounded-full hover:shadow-xl hover:shadow-cyan-500/20 transition-all duration-300 inline-flex items-center">
+                    <i class="fas fa-paper-plane mr-2.5"></i>
+                    <span>Get In Touch</span>
+                </a>
+                
+                <a href="#projects" 
+                   class="group relative overflow-hidden px-8 py-3.5 bg-transparent text-white font-medium rounded-full border-2 border-cyan-500/30 hover:border-cyan-400/50 transition-all duration-300 inline-flex items-center">
+                    <i class="fas fa-code-branch mr-2.5"></i>
+                    <span>View My Work</span>
+                </a>
+            </div>
+            
+            <!-- Social Links -->
+            <div class="flex justify-center space-x-5">
+                <a href="https://www.linkedin.com/in/matthewntsiful" target="_blank" rel="noopener noreferrer" 
+                   class="w-11 h-11 flex items-center justify-center rounded-full bg-gray-800/50 border border-gray-700/50 text-gray-300 hover:bg-cyan-600/20 hover:text-white hover:border-cyan-500/50 transition-colors duration-200">
+                    <i class="fab fa-linkedin-in text-base"></i>
+                </a>
+                <a href="https://github.com/matthewntsiful" target="_blank" rel="noopener noreferrer" 
+                   class="w-11 h-11 flex items-center justify-center rounded-full bg-gray-800/50 border border-gray-700/50 text-gray-300 hover:bg-purple-600/20 hover:text-white hover:border-purple-500/50 transition-colors duration-200">
+                    <i class="fab fa-github text-base"></i>
+                </a>
+                <a href="https://twitter.com/matthewntsiful" target="_blank" rel="noopener noreferrer" 
+                   class="w-11 h-11 flex items-center justify-center rounded-full bg-gray-800/50 border border-gray-700/50 text-gray-300 hover:bg-blue-600/20 hover:text-white hover:border-blue-500/50 transition-colors duration-200">
+                    <i class="fab fa-twitter text-base"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Scroll Down Indicator -->
+    <div class="absolute bottom-8 left-1/2 transform -translate-x-1/2 z-20">
+        <a href="#about" class="group flex flex-col items-center text-gray-400 hover:text-cyan-400 transition-colors duration-200">
+            <span class="text-xs font-medium tracking-wider mb-2 group-hover:translate-y-0.5 transition-transform duration-200">SCROLL DOWN</span>
+            <div class="w-6 h-10 rounded-full border border-cyan-500/30 flex justify-center p-1 group-hover:border-cyan-400/50 transition-colors duration-200">
+                <span class="w-0.5 h-2.5 bg-cyan-400/80 rounded-full animate-bounce"></span>
+            </div>
+        </a>
+    </div>
+    
+    <!-- Animated Gradient Overlay -->
+    <div class="absolute inset-0 bg-gradient-to-t from-gray-900 via-gray-900/90 to-transparent z-0"></div>
+</section>
+
+<!-- Custom Animations -->
+<style>
+    @keyframes float {
+        0%, 100% { transform: translateY(0) rotate(0deg); }
+        50% { transform: translateY(-20px) rotate(2deg); }
+    }
+    
+    @keyframes gradient {
+        0% { background-position: 0% 50%; }
+        50% { background-position: 100% 50%; }
+        100% { background-position: 0% 50%; }
+    }
+    
+    .animate-float {
+        animation: float 12s ease-in-out infinite;
+    }
+    
+    .animation-delay-2000 {
+        animation-delay: 2s;
+    }
+    
+    .animation-delay-4000 {
+        animation-delay: 4s;
+    }
+    
+    .animate-gradient {
+        background-size: 200% auto;
+        animation: gradient 8s ease infinite;
+    }
+    
+    .animate-gradient-slow {
+        background-size: 200% auto;
+        animation: gradient 12s ease infinite;
+    }
+    
+    .animate-fadeIn {
+        animation: fadeIn 0.5s ease-out forwards;
+    }
+    
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+</style>
+
+<!-- Typewriter Effect -->
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const typewriter = document.getElementById('typewriter');
+        const words = ['Cloud Architect', 'DevOps Engineer', 'AWS Specialist', 'Automation Expert', 'Infrastructure Developer'];
+        let wordIndex = 0;
+        let charIndex = 0;
+        let isDeleting = false;
+        let typeSpeed = 100;
+        let deleteSpeed = 50;
+        let waitTime = 2000;
+        let isCursorVisible = true;
+        
+        // Add cursor element
+        const cursor = document.createElement('span');
+        cursor.className = 'inline-block w-0.5 h-6 bg-cyan-400 ml-1 align-middle';
+        cursor.style.animation = 'blink 1s step-end infinite';
+        typewriter.appendChild(cursor);
+        
+        function type() {
+            const currentWord = words[wordIndex];
+            
+            if (isDeleting) {
+                // Delete character
+                typewriter.firstChild.textContent = currentWord.substring(0, charIndex - 1);
+                charIndex--;
+                typeSpeed = deleteSpeed;
+            } else {
+                // Type character
+                typewriter.firstChild.textContent = currentWord.substring(0, charIndex + 1);
+                charIndex++;
+                typeSpeed = 100;
+            }
+            
+            // Check if word is complete
+            if (!isDeleting && charIndex === currentWord.length) {
+                typeSpeed = waitTime;
+                isDeleting = true;
+            } else if (isDeleting && charIndex === 0) {
+                isDeleting = false;
+                wordIndex = (wordIndex + 1) % words.length;
+            }
+            
+            setTimeout(type, typeSpeed);
+        }
+        
+        // Create text node for typewriter content
+        const textNode = document.createTextNode('');
+        typewriter.insertBefore(textNode, cursor);
+        
+        // Start the typewriter effect after a short delay
+        setTimeout(type, 1000);
+        
+        // Add blinking cursor animation
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes blink {
+                0%, 100% { opacity: 1; }
+                50% { opacity: 0; }
+            }
+        `;
+        document.head.appendChild(style);
+        
+        // Initialize particles after hero is fully loaded
+        function initParticlesWithRetry(attempt = 0) {
+            const maxAttempts = 10;
+            const container = document.getElementById('particles-js');
+            
+            console.group('Particles Initialization');
+            console.log('Attempt:', attempt + 1);
+            console.log('Container exists:', !!container);
+            console.log('particlesJS available:', typeof particlesJS !== 'undefined');
+            console.log('initParticles available:', typeof window.initParticles === 'function');
+            
+            try {
+                if (typeof window.initParticles !== 'function') {
+                    throw new Error('initParticles function not found');
+                }
+                
+                if (!container) {
+                    throw new Error('Particles container not found');
+                }
+                
+                // Ensure container is visible and has dimensions
+                container.style.display = 'block';
+                container.style.position = 'absolute';
+                container.style.width = '100%';
+                container.style.height = '100%';
+                
+                console.log('Container dimensions:', {
+                    width: container.offsetWidth,
+                    height: container.offsetHeight,
+                    style: window.getComputedStyle(container)
+                });
+                
+                console.log('Initializing particles...');
+                const result = window.initParticles();
+                console.log('Particles initialization result:', result);
+                
+                if (result === false) {
+                    throw new Error('Particles initialization returned false');
+                }
+                
+                console.log('Particles initialized successfully!');
+                console.groupEnd();
+                return;
+                
+            } catch (error) {
+                console.error('Particles initialization error:', error);
+                
+                if (attempt < maxAttempts - 1) {
+                    const delay = Math.min(300 * (attempt + 1), 2000);
+                    console.log(`Retrying in ${delay}ms...`);
+                    setTimeout(() => initParticlesWithRetry(attempt + 1), delay);
+                } else {
+                    console.warn('Giving up after', maxAttempts, 'attempts');
+                    // Fallback to static background if particles fail to load
+                    const hero = document.querySelector('#hero');
+                    if (hero) {
+                        hero.style.background = 'linear-gradient(135deg, #0f172a 0%, #1e293b 100%)';
+                    }
+                }
+                
+                console.groupEnd();
+            }
+        }
+        
+        // Start initialization with a small delay to ensure DOM is ready
+        if (document.readyState === 'complete' || document.readyState === 'interactive') {
+            // If document is already loaded or loading
+            setTimeout(() => initParticlesWithRetry(), 100);
+        } else {
+            // Wait for DOM to be fully loaded
+            document.addEventListener('DOMContentLoaded', () => {
+                setTimeout(() => initParticlesWithRetry(), 100);
+            });
+        }
+    });
+</script>

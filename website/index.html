@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Matthew Odoom Ntsiful - Portfolio</title>
+    <!-- Preload critical CSS -->
+    <link rel="preload" href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css"></noscript>
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Custom styles -->
+    <style>
+        body { 
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            margin: 0; 
+            padding: 0;
+            background-color: #1a1a1a;
+            color: #e5e7eb;
+            line-height: 1.6;
+        }
+        
+        /* Status indicator */
+        #status {
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            padding: 12px 15px;
+            background: rgba(0,0,0,0.85);
+            border: 1px solid #374151;
+            border-radius: 8px;
+            z-index: 1000;
+            font-size: 13px;
+            max-width: 320px;
+            max-height: 80vh;
+            overflow-y: auto;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+        
+        /* Container styles */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 24px;
+            width: 100%;
+        }
+        
+        /* Section styles */
+        section {
+            padding: 80px 0;
+            position: relative;
+        }
+        
+        /* Smooth scrolling */
+        html {
+            scroll-behavior: smooth;
+        }
+        
+        /* Typography */
+        h1, h2, h3, h4, h5, h6 {
+            font-weight: 700;
+            line-height: 1.2;
+            margin-top: 0;
+        }
+        
+        /* Links */
+        a {
+            color: #3b82f6;
+            text-decoration: none;
+            transition: color 0.2s ease;
+        }
+        
+        a:hover {
+            color: #60a5fa;
+        }
+        
+        /* Buttons */
+        .btn {
+            display: inline-block;
+            padding: 10px 24px;
+            border-radius: 6px;
+            font-weight: 600;
+            text-align: center;
+            transition: all 0.2s ease;
+            cursor: pointer;
+        }
+        
+        .btn-primary {
+            background-color: #3b82f6;
+            color: white;
+            border: 2px solid #3b82f6;
+        }
+        
+        .btn-primary:hover {
+            background-color: #2563eb;
+            border-color: #2563eb;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+        
+        /* Utility classes */
+        .text-gradient {
+            background: linear-gradient(90deg, #3b82f6, #8b5cf6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <div id="navbar"></div>
+
+    <!-- Hero Section -->
+    <section id="hero"></section>
+
+    <!-- About Section -->
+    <section id="about" class="container"></section>
+
+    <!-- Skills Section -->
+    <section id="skills" class="container"></section>
+
+    <!-- Projects Section -->
+    <section id="projects" class="container"></section>
+
+    <!-- Certifications Section -->
+    <section id="certifications" class="container"></section>
+
+    <!-- Resume Section -->
+    <section id="resume" class="container"></section>
+
+    <!-- Blog Section -->
+    <section id="blog" class="container"></section>
+
+    <!-- Contact Section -->
+    <section id="contact" class="container"></section>
+
+    <!-- Footer -->
+    <footer id="footer"></footer>
+
+    <!-- JavaScript Dependencies -->
+    <script>
+        // Silent status update function
+        function updateStatus() {}
+        
+        // Helper function to load scripts - exposed globally
+        window.loadScript = function(src) {
+            return new Promise((resolve, reject) => {
+                const script = document.createElement('script');
+                script.src = src;
+                script.onload = () => {
+                    console.log(`Script loaded: ${src}`);
+                    resolve();
+                };
+                script.onerror = (error) => {
+                    console.error(`Failed to load script: ${src}`, error);
+                    reject(new Error(`Failed to load script: ${src}`));
+                };
+                document.head.appendChild(script);
+            });
+        }
+        
+        // Helper function to check if a function exists
+        function functionExists(functionName) {
+            const exists = typeof window[functionName] === 'function';
+            console.log(`Checking if ${functionName} exists:`, exists);
+            return exists;
+        }
+
+        // Load all required scripts in order
+        async function loadAllScripts() {
+            try {
+                // Load typewriter-effect
+                await loadScript('https://unpkg.com/typewriter-effect@2.3.1/dist/core.js');
+                
+                // Load particles.js
+                await loadScript('https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js');
+                
+                // Load main application script
+                await loadScript('js/main.js');
+                
+                // Initialize components
+                const componentsLoader = window.loadComponents || (typeof loadComponents === 'function' ? loadComponents : null);
+                
+                if (componentsLoader) {
+                    componentsLoader();
+                } else {
+                    console.error('Failed to initialize components: loadComponents function not found');
+                }
+            } catch (error) {
+                console.error('Error loading scripts:', error);
+            }
+        }
+        
+        // Start loading all scripts
+        loadAllScripts();
+    </script>
+</body>
+</html>
