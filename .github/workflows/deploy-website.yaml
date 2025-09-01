@@ -37,6 +37,7 @@ jobs:
       bucket-name: ${{ steps.deploy-step.outputs.bucket-name }}
       cloudfront-url: ${{ steps.invalidate-step.outputs.cloudfront-url }}
     
+  
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
