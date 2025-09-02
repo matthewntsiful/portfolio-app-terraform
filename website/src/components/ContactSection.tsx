@@ -28,19 +28,77 @@ const ContactSection = () => {
     email: "",
     message: "",
   });
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [errors, setErrors] = useState<{[key: string]: string}>({});
+
+  const validateForm = () => {
+    const newErrors: {[key: string]: string} = {};
+    
+    if (!formData.name.trim()) {
+      newErrors.name = "Name is required";
+    }
+    
+    if (!formData.email.trim()) {
+      newErrors.email = "Email is required";
+    } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
+      newErrors.email = "Please enter a valid email";
+    }
+    
+    if (!formData.message.trim()) {
+      newErrors.message = "Message is required";
+    } else if (formData.message.trim().length < 10) {
+      newErrors.message = "Message must be at least 10 characters";
+    }
+    
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { id, value } = e.target;
     setFormData(prev => ({ ...prev, [id]: value }));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    toast({
-      title: "Message Sent!",
-      description: "Thank you for reaching out. I'll get back to you soon.",
-    });
-    setFormData({ name: "", email: "", message: "" });
+    
+    if (!validateForm()) {
+      return;
+    }
+    
+    setIsSubmitting(true);
+
+    try {
+      const response = await fetch('https://formspree.io/f/xpwzgqpb', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          name: formData.name,
+          email: formData.email,
+          message: formData.message,
+        }),
+      });
+
+      if (response.ok) {
+        toast({
+          title: "Message Sent Successfully! ✅",
+          description: "Thank you for reaching out. I'll get back to you within 24 hours.",
+        });
+        setFormData({ name: "", email: "", message: "" });
+      } else {
+        throw new Error('Failed to send message');
+      }
+    } catch (error) {
+      toast({
+        title: "Failed to Send Message ❌",
+        description: "Please try again or contact me directly at matthew.ntsiful@gmail.com",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const contactInfo = [
@@ -96,9 +154,10 @@ const ContactSection = () => {
                     id="name"
                     value={formData.name}
                     onChange={handleInputChange}
-                    className="w-full mt-2 bg-card border-border focus:ring-primary"
+                    className={`w-full mt-2 bg-card border-border focus:ring-primary ${errors.name ? 'border-destructive' : ''}`}
                     required
                   />
+                  {errors.name && <p className="text-destructive text-sm mt-1">{errors.name}</p>}
                 </div>
                 <div>
                   <Label htmlFor="email" className="text-foreground">Email</Label>
@@ -107,9 +166,10 @@ const ContactSection = () => {
                     id="email"
                     value={formData.email}
                     onChange={handleInputChange}
-                    className="w-full mt-2 bg-card border-border focus:ring-primary"
+                    className={`w-full mt-2 bg-card border-border focus:ring-primary ${errors.email ? 'border-destructive' : ''}`}
                     required
                   />
+                  {errors.email && <p className="text-destructive text-sm mt-1">{errors.email}</p>}
                 </div>
                 <div>
                   <Label htmlFor="message" className="text-foreground">Message</Label>
@@ -118,15 +178,17 @@ const ContactSection = () => {
                     rows={5}
                     value={formData.message}
                     onChange={handleInputChange}
-                    className="w-full mt-2 bg-card border-border focus:ring-primary resize-none"
+                    className={`w-full mt-2 bg-card border-border focus:ring-primary resize-none ${errors.message ? 'border-destructive' : ''}`}
                     required
                   />
+                  {errors.message && <p className="text-destructive text-sm mt-1">{errors.message}</p>}
                 </div>
                 <Button
                   type="submit"
-                  className="w-full bg-primary text-primary-foreground hover:bg-primary/90 shadow-glow-blue"
+                  disabled={isSubmitting}
+                  className="w-full bg-primary text-primary-foreground hover:bg-primary/90 shadow-glow-blue disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  Send Message
+                  {isSubmitting ? "Sending..." : "Send Message"}
                 </Button>
               </form>
             </div>
