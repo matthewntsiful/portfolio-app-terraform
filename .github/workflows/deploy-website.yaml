@@ -7,7 +7,7 @@ on:
       - 'devops-engineers'
       - 'web-developers'
     paths:
-      - 'website/**'  # Matches your simplified structure
+      - 'website/**'
       - '.github/workflows/deploy-website.yaml'
   workflow_dispatch:
     inputs:
@@ -37,7 +37,6 @@ jobs:
       bucket-name: ${{ steps.deploy-step.outputs.bucket-name }}
       cloudfront-url: ${{ steps.invalidate-step.outputs.cloudfront-url }}
     
-  
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
@@ -69,6 +68,8 @@ jobs:
       uses: actions/setup-node@v4
       with:
         node-version: '18'
+        cache: 'npm'
+        cache-dependency-path: website/package-lock.json
 
     - name: Debug Repository Structure
       run: |
@@ -76,55 +77,96 @@ jobs:
         echo "Current directory: $(pwd)"
         echo "Root contents:"
         ls -la
-        echo "Looking for website directory:"
-        find . -name "package.json" -type f
+        echo "Website directory exists:"
+        test -d website && echo "✅ website/ directory found" || echo "❌ website/ directory missing"
+        echo "Package.json locations:"
+        find . -name "package.json" -type f 2>/dev/null || echo "No package.json found"
         echo "=== End Debug ==="
 
     - name: Install Dependencies
       working-directory: website
-      run: npm install
+      run: |
+        echo "Installing npm dependencies..."
+        npm ci --prefer-offline --no-audit
+        echo "Dependencies installed successfully"
+
+    - name: Verify Build Script
+      working-directory: website
+      run: |
+        echo "Checking available npm scripts:"
+        npm run --silent 2>/dev/null || echo "No scripts available"
+        echo "Package.json scripts section:"
+        cat package.json | grep -A 10 '"scripts"' || echo "No scripts section found"
 
     - name: Build Website
       working-directory: website
       run: |
         echo "Building React application for production..."
-        npm run build:prod
-        echo "Build completed. Contents of dist/:"
-        ls -la dist/
+        # Try common build script names
+        if npm run | grep -q "build:prod"; then
+          npm run build:prod
+        elif npm run | grep -q "build"; then
+          npm run build
+        else
+          echo "❌ No build script found. Available scripts:"
+          npm run
+          exit 1
+        fi
+        
+        echo "Build completed successfully"
+        echo "Checking build output directory..."
+        
+        # Check for common build output directories
+        if [ -d "dist" ]; then
+          BUILD_DIR="dist"
+        elif [ -d "build" ]; then
+          BUILD_DIR="build"
+        else
+          echo "❌ No build output directory found"
+          echo "Available directories:"
+          ls -la
+          exit 1
+        fi
+        
+        echo "Build directory: $BUILD_DIR"
+        echo "Build contents:"
+        ls -la $BUILD_DIR/
         echo "Checking for index.html:"
-        test -f dist/index.html && echo "✅ index.html found" || echo "❌ index.html missing"
+        test -f $BUILD_DIR/index.html && echo "✅ index.html found" || echo "❌ index.html missing"
+        
+        # Export build directory for next steps
+        echo "BUILD_DIR=$BUILD_DIR" >> $GITHUB_ENV
 
-    - name: Debug Repository Structure
+    - name: Debug Build Output
+      working-directory: website
       run: |
-        echo "=== DEBUGGING REPOSITORY STRUCTURE ==="
+        echo "=== DEBUGGING BUILD OUTPUT ==="
         echo "Current working directory: $(pwd)"
-        echo "Root directory contents:"
-        ls -la
-        echo ""
-        echo "Website directory contents:"
-        ls -la website/
-        echo ""
-        echo "Built website contents (dist/):"
-        ls -la website/dist/
-        echo "=== END DEBUGGING ===
+        echo "Build directory: $BUILD_DIR"
+        echo "Built website contents:"
+        ls -la $BUILD_DIR/
+        echo "Total files in build:"
+        find $BUILD_DIR -type f | wc -l
+        echo "=== END BUILD DEBUG ==="
 
     - name: Deploy to S3
       id: deploy-step
       if: github.event.inputs.action != 'invalidate-cache'
-      working-directory: website/dist  # Deploy from built files
+      working-directory: website
       run: |
         BUCKET_NAME="${{ secrets.S3_BUCKET_NAME }}"
         
         echo "=== STARTING DEPLOYMENT ==="
         echo "Working directory: $(pwd)"
+        echo "Build directory: $BUILD_DIR"
         echo "Files to deploy:"
-        ls -la
+        ls -la $BUILD_DIR/
         echo ""
         
-        # Upload files directly to S3 bucket root (no prefix)
-        # This works with the simplified CloudFront configuration
+        # Change to build directory
+        cd $BUILD_DIR
         
-        # Sync HTML files with no-cache headers (for dynamic content)
+        # Upload files directly to S3 bucket root
         echo "Syncing HTML files..."
         aws s3 sync . s3://$BUCKET_NAME/ \
           --cache-control "no-cache, no-store, must-revalidate" \
@@ -132,7 +174,6 @@ jobs:
           --include "*.html" \
           --delete
         
-        # Sync CSS and JS files with medium cache
         echo "Syncing CSS and JS files..."
         aws s3 sync . s3://$BUCKET_NAME/ \
           --cache-control "public, max-age=604800" \
@@ -140,7 +181,6 @@ jobs:
           --include "*.css" \
           --include "*.js"
         
-        # Sync image and other static assets with long cache
         echo "Syncing static assets..."
         aws s3 sync . s3://$BUCKET_NAME/ \
           --cache-control "public, max-age=2592000" \
@@ -149,7 +189,6 @@ jobs:
           --include "*.svg" --include "*.ico" --include "*.json" \
           --include "*.pdf" --include "*.woff" --include "*.woff2"
         
-        # Sync asset directories
         echo "Syncing asset directories..."
         aws s3 sync . s3://$BUCKET_NAME/ \
           --cache-control "public, max-age=2592000" \
@@ -161,12 +200,10 @@ jobs:
           --include "components/**" \
           --include "images/**"
         
-        # Final sync for any remaining files
         echo "Final sync for remaining files..."
         aws s3 sync . s3://$BUCKET_NAME/ \
           --cache-control "public, max-age=86400"
         
-        # Verify upload
         echo ""
         echo "=== VERIFYING DEPLOYMENT ==="
         echo "Files now in S3 bucket:"
@@ -191,10 +228,8 @@ jobs:
           
           echo "Invalidation created with ID: $INVALIDATION_ID"
           
-          # Wait a moment for the invalidation to register
           sleep 5
           
-          # Check invalidation status
           aws cloudfront get-invalidation \
             --distribution-id $DISTRIBUTION_ID \
             --id $INVALIDATION_ID \
@@ -208,7 +243,7 @@ jobs:
           
           echo "cloudfront-url=$CLOUDFRONT_URL" >> $GITHUB_OUTPUT
           echo "CloudFront URL: https://$CLOUDFRONT_URL"
-          echo "Your website should be available at: https://${{ vars.DOMAIN_NAME || 'your-domain.com' }}"
+          echo "Your website should be available at: https://${{ vars.DOMAIN_NAME || 'matthewntsiful.com' }}"
         else
           echo "No CloudFront distribution ID provided, skipping invalidation"
         fi
