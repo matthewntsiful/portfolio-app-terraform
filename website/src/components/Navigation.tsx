@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { HiMenu, HiX } from "react-icons/hi";
 import { Button } from "@/components/ui/button";
+import { ThemeToggle } from "./ThemeToggle";
 
 const Navigation = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -45,8 +46,14 @@ const Navigation = () => {
           ))}
         </div>
         
+        {/* Theme Toggle */}
+        <div className="hidden md:flex items-center mr-4">
+          <ThemeToggle />
+        </div>
+        
         {/* Mobile Menu Button */}
-        <div className="md:hidden">
+        <div className="md:hidden flex items-center space-x-2">
+          <ThemeToggle />
           <button
             onClick={() => setIsMenuOpen(!isMenuOpen)}
             className="text-white/80 hover:text-white transition-colors p-2 rounded-lg hover:bg-white/10"
