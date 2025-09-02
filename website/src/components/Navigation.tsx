@@ -40,7 +40,7 @@ const Navigation = () => {
               <button
                 key={item.href}
                 onClick={() => scrollToSection(item.href)}
-                className="relative text-white/80 hover:text-white transition-all duration-300 font-medium px-3 py-2 rounded-lg hover:bg-white/10 backdrop-blur-sm"
+                className="relative text-foreground/80 hover:text-foreground transition-all duration-300 font-medium px-3 py-2 rounded-lg hover:bg-accent/10 backdrop-blur-sm"
               >
                 {item.label}
               </button>
@@ -54,7 +54,7 @@ const Navigation = () => {
           <ThemeToggle />
           <button
             onClick={() => setIsMenuOpen(!isMenuOpen)}
-            className="text-white/80 hover:text-white transition-colors p-2 rounded-lg hover:bg-white/10"
+            className="text-foreground/80 hover:text-foreground transition-colors p-2 rounded-lg hover:bg-accent/10"
           >
             {isMenuOpen ? <HiX className="text-xl" /> : <HiMenu className="text-xl" />}
           </button>
@@ -69,7 +69,7 @@ const Navigation = () => {
               <button
                 key={item.href}
                 onClick={() => scrollToSection(item.href)}
-                className="text-white/80 hover:text-white transition-all duration-300 text-left font-medium py-2 px-4 rounded-lg hover:bg-white/10"
+                className="text-foreground/80 hover:text-foreground transition-all duration-300 text-left font-medium py-2 px-4 rounded-lg hover:bg-accent/10"
               >
                 {item.label}
               </button>

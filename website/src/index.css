@@ -37,6 +37,26 @@
     /* Light theme gradients */
     --hero-bg: linear-gradient(125deg, hsl(210 40% 98%) 0%, hsl(220 14% 96%) 50%, hsl(214 32% 91%) 100%);
     --gradient-glass: linear-gradient(135deg, rgba(255,255,255,0.8), rgba(255,255,255,0.4));
+    
+    /* Common variables for light theme */
+    --glow-blue: 0 0 40px hsl(var(--electric-blue) / 0.3);
+    --glow-green: 0 0 40px hsl(var(--electric-green) / 0.3);
+    --glow-purple: 0 0 40px hsl(var(--electric-purple) / 0.3);
+    --animate-bounce: bounce 2s infinite;
+    --animate-pulse: pulse 2s infinite;
+    --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    --gradient-primary: linear-gradient(135deg, hsl(var(--electric-blue)), hsl(var(--electric-purple)));
+    --gradient-secondary: linear-gradient(135deg, hsl(var(--electric-green)), hsl(var(--electric-blue)));
+    --gradient-accent: linear-gradient(135deg, hsl(var(--electric-purple)), hsl(var(--electric-green)));
+    --gradient-modern: linear-gradient(135deg, hsl(210 100% 60%), hsl(260 100% 70%));
+    --shadow-modern: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+    --shadow-glass: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+    --gradient-card-1: linear-gradient(135deg, hsl(var(--electric-blue)), hsl(var(--electric-purple)));
+    --gradient-card-2: linear-gradient(135deg, hsl(var(--electric-green)), hsl(var(--electric-blue)));
+    --gradient-card-3: linear-gradient(135deg, hsl(var(--electric-purple)), hsl(var(--electric-green)));
+    --gradient-card-4: linear-gradient(135deg, hsl(214 100% 59%), hsl(277 85% 60%));
+    --gradient-card-5: linear-gradient(135deg, hsl(142 76% 50%), hsl(214 100% 59%));
+    --gradient-card-6: linear-gradient(135deg, hsl(277 85% 60%), hsl(328 85% 65%));
   }
   
   .dark {
