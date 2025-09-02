@@ -12,10 +12,10 @@ const Footer = () => {
       <div className="container mx-auto px-6">
         <div className="flex flex-col md:flex-row justify-between items-center">
           <div className="mb-8 md:mb-0 text-center md:text-left">
-            <p className="text-white font-medium text-lg">
+            <p className="text-foreground font-medium text-lg">
               &copy; 2024 Matthew Odoom Ntsiful. All rights reserved.
             </p>
-            <p className="text-white/60 text-sm mt-2">
+            <p className="text-muted-foreground text-sm mt-2">
               Built with React + Tailwind + AWS S3 + CloudFront + Route 53
             </p>
           </div>
@@ -27,7 +27,7 @@ const Footer = () => {
                 href={social.href}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-center justify-center w-12 h-12 rounded-full bg-white/10 backdrop-blur-sm text-white/70 hover:text-white hover:bg-white/20 transition-all duration-300 transform hover:scale-110"
+                className="flex items-center justify-center w-12 h-12 rounded-full bg-card/50 backdrop-blur-sm text-muted-foreground hover:text-foreground hover:bg-accent/20 transition-all duration-300 transform hover:scale-110"
                 aria-label={social.label}
               >
                 <social.icon className="text-xl" />

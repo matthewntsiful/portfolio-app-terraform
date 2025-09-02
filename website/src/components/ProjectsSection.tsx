@@ -120,7 +120,7 @@ const ProjectsSection = () => {
                 className={`px-6 py-3 rounded-xl font-medium transition-all duration-300 ${
                   activeFilter === filter.id
                     ? "bg-gradient-primary text-white shadow-glow-blue transform scale-105"
-                    : "bg-white/5 text-white/70 hover:bg-white/10 hover:text-white border border-white/20"
+                    : "bg-card/50 text-muted-foreground hover:bg-accent/10 hover:text-foreground border border-border"
                 }`}
               >
                 {filter.label}
@@ -180,7 +180,7 @@ const ProjectsSection = () => {
                       <FaCode className="text-sm" />
                       View Code
                     </button>
-                    <button className="flex items-center justify-center gap-2 bg-white/10 text-white py-2 px-4 rounded-lg font-medium hover:bg-white/20 transition-all duration-300">
+                    <button className="flex items-center justify-center gap-2 bg-card/50 text-foreground py-2 px-4 rounded-lg font-medium hover:bg-accent/20 transition-all duration-300">
                       <FaExternalLinkAlt className="text-sm" />
                     </button>
                   </div>

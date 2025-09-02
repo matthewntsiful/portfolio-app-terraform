@@ -73,7 +73,7 @@ const HeroSection = () => {
           </button>
           <button
             onClick={() => scrollToSection("#contact")}
-            className="px-10 py-4 bg-gradient-glass backdrop-blur-md border border-white/20 text-white rounded-xl font-semibold hover:bg-white/20 transition-all duration-300 inline-flex items-center justify-center"
+            className="px-10 py-4 bg-gradient-glass backdrop-blur-md border border-border text-foreground rounded-xl font-semibold hover:bg-accent/20 transition-all duration-300 inline-flex items-center justify-center"
           >
             <HiMail className="mr-2" />
             Let's Connect
