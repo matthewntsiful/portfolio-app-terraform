@@ -1,5 +1,7 @@
 import { useInView } from "react-intersection-observer";
 import { Button } from "@/components/ui/button";
+import { Link } from "react-router-dom";
+import { blogPosts } from "@/data/blogPosts";
 
 const BlogSection = () => {
   const { ref, inView } = useInView({
@@ -7,26 +9,7 @@ const BlogSection = () => {
     threshold: 0.1,
   });
 
-  const blogPosts = [
-    {
-      title: "Optimizing AWS Costs for Startups",
-      description: "Practical strategies to reduce your cloud bill without sacrificing performance or reliability.",
-      date: "June 15, 2023",
-      gradient: "bg-gradient-card-4",
-    },
-    {
-      title: "Building Secure CI/CD Pipelines",
-      description: "How to implement security best practices in your deployment pipelines from day one.",
-      date: "May 28, 2023",
-      gradient: "bg-gradient-card-5",
-    },
-    {
-      title: "Kubernetes Disaster Recovery Strategies",
-      description: "Ensure business continuity with these proven techniques for Kubernetes cluster recovery.",
-      date: "April 10, 2023",
-      gradient: "bg-gradient-card-6",
-    },
-  ];
+
 
   return (
     <section id="blog" className="py-20 bg-background">
@@ -60,9 +43,12 @@ const BlogSection = () => {
                   <p className="text-muted-foreground mb-4">
                     {post.description}
                   </p>
-                  <button className="text-primary hover:underline font-medium">
-                    Read More
-                  </button>
+                  <div className="flex items-center justify-between">
+                    <Link to={`/blog/${post.id}`} className="text-primary hover:underline font-medium">
+                      Read More
+                    </Link>
+                    <span className="text-sm text-muted-foreground">{post.readTime}</span>
+                  </div>
                 </div>
               </div>
             ))}
