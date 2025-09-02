@@ -1,5 +1,5 @@
 import { useInView } from "react-intersection-observer";
-import { FaAws, FaGraduationCap, FaRocket, FaLinkedin } from "react-icons/fa";
+import { FaAws, FaGraduationCap, FaRocket, FaCertificate } from "react-icons/fa";
 
 const CertificationsSection = () => {
   const { ref, inView } = useInView({
@@ -73,7 +73,7 @@ const CertificationsSection = () => {
               rel="noopener noreferrer"
               className="inline-flex items-center px-8 py-4 bg-gradient-primary text-white rounded-xl font-semibold hover:shadow-glow-blue transform hover:scale-105 transition-all duration-300"
             >
-              <FaLinkedin className="mr-3 text-lg" />
+              <FaCertificate className="mr-3 text-lg" />
               View All Certifications on Credly
             </a>
           </div>
