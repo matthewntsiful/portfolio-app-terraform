@@ -85,7 +85,7 @@ jobs:
       working-directory: website
       run: |
         echo "Installing npm dependencies..."
-        npm ci --prefer-offline --no-audit
+        npm install --no-audit
         echo "Dependencies installed successfully"
 
     - name: Verify Build Script
