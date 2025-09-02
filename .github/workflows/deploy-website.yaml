@@ -69,7 +69,6 @@ jobs:
       with:
         node-version: '18'
         cache: 'npm'
-        cache-dependency-path: website/package-lock.json
 
     - name: Debug Repository Structure
       run: |
@@ -243,7 +242,7 @@ jobs:
           
           echo "cloudfront-url=$CLOUDFRONT_URL" >> $GITHUB_OUTPUT
           echo "CloudFront URL: https://$CLOUDFRONT_URL"
-          echo "Your website should be available at: https://${{ vars.DOMAIN_NAME || 'matthewntsiful.com' }}"
+          echo "Your website should be available at: https://${{ vars.DOMAIN_NAME || 'your-domain.com' }}"
         else
           echo "No CloudFront distribution ID provided, skipping invalidation"
         fi
