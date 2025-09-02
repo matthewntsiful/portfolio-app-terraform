@@ -229,17 +229,24 @@ resource "aws_cloudfront_distribution" "main" {
     minimum_protocol_version = "TLSv1.2_2021"
   }
 
-  # Error pages - now pointing to bucket root paths
+  # Error pages for SPA routing support
   custom_error_response {
     error_code         = 404
-    response_code      = 404
-    response_page_path = "/404.html"  # Direct path in bucket root
+    response_code      = 200
+    response_page_path = "/index.html"  # SPA routing - redirect to index.html
   }
 
   custom_error_response {
     error_code         = 403
-    response_code      = 403
-    response_page_path = "/403.html"  # Direct path in bucket root
+    response_code      = 200
+    response_page_path = "/index.html"  # SPA routing - redirect to index.html
+  }
+
+  # Additional error page for actual 404s
+  custom_error_response {
+    error_code         = 400
+    response_code      = 404
+    response_page_path = "/404.html"  # Actual 404 page
   }
 
   tags = merge(local.common_tags, {

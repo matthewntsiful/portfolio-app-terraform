@@ -1,0 +1,79 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Modern Portfolio Design System */
+@layer base {
+  :root {
+    /* Base colors */
+    --background: 220 13% 9%;
+    --foreground: 210 40% 98%;
+    --card: 220 13% 9%;
+    --card-foreground: 210 40% 98%;
+    --popover: 220 13% 9%;
+    --popover-foreground: 210 40% 98%;
+    
+    /* Electric theme colors */
+    --electric-blue: 203 100% 47%;
+    --electric-green: 179 100% 44%;
+    --electric-purple: 277 100% 48%;
+    
+    /* Semantic colors using electric theme */
+    --primary: 203 100% 47%;
+    --primary-foreground: 210 40% 98%;
+    --secondary: 220 13% 18%;
+    --secondary-foreground: 210 40% 98%;
+    --muted: 220 13% 18%;
+    --muted-foreground: 215 20.2% 65.1%;
+    --accent: 179 100% 44%;
+    --accent-foreground: 220 13% 9%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 220 13% 18%;
+    --input: 220 13% 18%;
+    --ring: 203 100% 47%;
+    --radius: 0.5rem;
+    
+    /* Hero gradient background */
+    --hero-bg: linear-gradient(125deg, hsl(230 35% 7%) 0%, hsl(240 27% 13%) 50%, hsl(221 39% 17%) 100%);
+    
+    /* Glowing effects */
+    --glow-blue: 0 0 40px hsl(var(--electric-blue) / 0.3);
+    --glow-green: 0 0 40px hsl(var(--electric-green) / 0.3);
+    --glow-purple: 0 0 40px hsl(var(--electric-purple) / 0.3);
+    
+    /* Animations */
+    --animate-bounce: bounce 2s infinite;
+    --animate-pulse: pulse 2s infinite;
+    --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    
+    /* Gradients */
+    --gradient-primary: linear-gradient(135deg, hsl(var(--electric-blue)), hsl(var(--electric-purple)));
+    --gradient-secondary: linear-gradient(135deg, hsl(var(--electric-green)), hsl(var(--electric-blue)));
+    --gradient-accent: linear-gradient(135deg, hsl(var(--electric-purple)), hsl(var(--electric-green)));
+    --gradient-modern: linear-gradient(135deg, hsl(210 100% 60%), hsl(260 100% 70%));
+    --gradient-glass: linear-gradient(135deg, rgba(255,255,255,0.1), rgba(255,255,255,0.05));
+    
+    /* Enhanced shadows */
+    --shadow-modern: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+    --shadow-glass: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+    
+    /* Project card gradients */
+    --gradient-card-1: linear-gradient(135deg, hsl(var(--electric-blue)), hsl(var(--electric-purple)));
+    --gradient-card-2: linear-gradient(135deg, hsl(var(--electric-green)), hsl(var(--electric-blue)));
+    --gradient-card-3: linear-gradient(135deg, hsl(var(--electric-purple)), hsl(var(--electric-green)));
+    --gradient-card-4: linear-gradient(135deg, hsl(214 100% 59%), hsl(277 85% 60%));
+    --gradient-card-5: linear-gradient(135deg, hsl(142 76% 50%), hsl(214 100% 59%));
+    --gradient-card-6: linear-gradient(135deg, hsl(277 85% 60%), hsl(328 85% 65%));
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+  }
+}

@@ -56,6 +56,27 @@ jobs:
         sudo ./aws/install --update
         aws --version
 
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'npm'
+        cache-dependency-path: website/package-lock.json
+
+    - name: Install Dependencies
+      working-directory: website
+      run: npm ci
+
+    - name: Build Website
+      working-directory: website
+      run: |
+        echo "Building React application for production..."
+        npm run build:prod
+        echo "Build completed. Contents of dist/:"
+        ls -la dist/
+        echo "Checking for index.html:"
+        test -f dist/index.html && echo "✅ index.html found" || echo "❌ index.html missing"
+
     - name: Debug Repository Structure
       run: |
         echo "=== DEBUGGING REPOSITORY STRUCTURE ==="
@@ -65,12 +86,15 @@ jobs:
         echo ""
         echo "Website directory contents:"
         ls -la website/
-        echo "=== END DEBUGGING ==="
+        echo ""
+        echo "Built website contents (dist/):"
+        ls -la website/dist/
+        echo "=== END DEBUGGING ===
 
     - name: Deploy to S3
       id: deploy-step
       if: github.event.inputs.action != 'invalidate-cache'
-      working-directory: website  # Now points directly to website/ folder
+      working-directory: website/dist  # Deploy from built files
       run: |
         BUCKET_NAME="${{ secrets.S3_BUCKET_NAME }}"
         
