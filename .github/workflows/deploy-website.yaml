@@ -55,31 +55,10 @@ jobs:
         sudo ./aws/install --update
         aws --version
 
-    - name: Debug AWS Configuration
-      run: |
-        echo "AWS Region: $AWS_REGION"
-        echo "AWS Identity:"
-        aws sts get-caller-identity
-        echo "S3 Bucket: ${{ secrets.S3_BUCKET_NAME }}"
-        echo "Testing S3 access:"
-        aws s3 ls s3://${{ secrets.S3_BUCKET_NAME }}/ || echo "S3 access failed"
-
     - name: Setup Node.js
       uses: actions/setup-node@v4
       with:
         node-version: '18'
-
-    - name: Debug Repository Structure
-      run: |
-        echo "=== Repository Structure Debug ==="
-        echo "Current directory: $(pwd)"
-        echo "Root contents:"
-        ls -la
-        echo "Website directory exists:"
-        test -d website && echo "✅ website/ directory found" || echo "❌ website/ directory missing"
-        echo "Package.json locations:"
-        find . -name "package.json" -type f 2>/dev/null || echo "No package.json found"
-        echo "=== End Debug ==="
 
     - name: Install Dependencies
       working-directory: website
@@ -87,14 +66,6 @@ jobs:
         echo "Installing npm dependencies..."
         npm install --no-audit
         echo "Dependencies installed successfully"
-
-    - name: Verify Build Script
-      working-directory: website
-      run: |
-        echo "Checking available npm scripts:"
-        npm run --silent 2>/dev/null || echo "No scripts available"
-        echo "Package.json scripts section:"
-        cat package.json | grep -A 10 '"scripts"' || echo "No scripts section found"
 
     - name: Build Website
       working-directory: website
@@ -135,18 +106,6 @@ jobs:
         # Export build directory for next steps
         echo "BUILD_DIR=$BUILD_DIR" >> $GITHUB_ENV
 
-    - name: Debug Build Output
-      working-directory: website
-      run: |
-        echo "=== DEBUGGING BUILD OUTPUT ==="
-        echo "Current working directory: $(pwd)"
-        echo "Build directory: $BUILD_DIR"
-        echo "Built website contents:"
-        ls -la $BUILD_DIR/
-        echo "Total files in build:"
-        find $BUILD_DIR -type f | wc -l
-        echo "=== END BUILD DEBUG ==="
-
     - name: Deploy to S3
       id: deploy-step
       if: github.event.inputs.action != 'invalidate-cache'
@@ -154,51 +113,13 @@ jobs:
       run: |
         BUCKET_NAME="${{ secrets.S3_BUCKET_NAME }}"
         
-        echo "=== STARTING DEPLOYMENT ==="
-        echo "Working directory: $(pwd)"
-        echo "Build directory: $BUILD_DIR"
-        echo "S3 Bucket: $BUCKET_NAME"
+        echo "🚀 Deploying to S3 bucket: $BUCKET_NAME"
         
-        # Check if bucket name is set
-        if [ -z "$BUCKET_NAME" ]; then
-          echo "❌ ERROR: S3_BUCKET_NAME secret is not set"
-          echo "Please set the S3_BUCKET_NAME secret in your GitHub repository"
-          exit 1
-        fi
+        # Validate prerequisites
+        [ -z "$BUCKET_NAME" ] && { echo "❌ S3_BUCKET_NAME not set"; exit 1; }
+        [ ! -d "$BUILD_DIR" ] && { echo "❌ Build directory missing"; exit 1; }
         
-        # Test AWS credentials
-        echo "Testing AWS credentials..."
-        aws sts get-caller-identity || {
-          echo "❌ ERROR: AWS credentials not configured properly"
-          echo "Please check your AWS_ROLE_ARN secret and OIDC setup"
-          exit 1
-        }
-        
-        # Test S3 bucket access
-        echo "Testing S3 bucket access..."
-        aws s3 ls s3://$BUCKET_NAME/ || {
-          echo "❌ ERROR: Cannot access S3 bucket: $BUCKET_NAME"
-          echo "Please check bucket exists and permissions are correct"
-          exit 1
-        }
-        
-        echo "Files to deploy:"
-        ls -la $BUILD_DIR/
-        echo ""
-        
-        # Verify build directory exists
-        if [ ! -d "$BUILD_DIR" ]; then
-          echo "❌ ERROR: Build directory $BUILD_DIR does not exist"
-          echo "Available directories:"
-          ls -la
-          exit 1
-        fi
-        
-        # Change to build directory
         cd $BUILD_DIR
-        echo "Changed to build directory: $(pwd)"
-        echo "Files in build directory:"
-        ls -la
         
         # Upload files directly to S3 bucket root
         echo "Syncing HTML files..."
@@ -238,13 +159,8 @@ jobs:
         aws s3 sync . s3://$BUCKET_NAME/ \
           --cache-control "public, max-age=86400"
         
-        echo ""
-        echo "=== VERIFYING DEPLOYMENT ==="
-        echo "Files now in S3 bucket:"
-        aws s3 ls s3://$BUCKET_NAME/ --recursive --human-readable --summarize
-        
+        echo "✅ Deployment completed successfully!"
         echo "bucket-name=$BUCKET_NAME" >> $GITHUB_OUTPUT
-        echo "Website successfully uploaded to S3 bucket: $BUCKET_NAME"
 
     - name: Invalidate CloudFront Cache
       id: invalidate-step
