@@ -6,7 +6,8 @@ import {
   FaPython,
   FaCheck,
   FaLinux,
-  FaTerminal
+  FaTerminal,
+  FaShieldAlt
 } from "react-icons/fa";
 import { 
   SiTerraform, 
@@ -28,6 +29,7 @@ const AboutSection = () => {
     { icon: SiKubernetes, name: "Kubernetes", color: "text-blue-400" },
     { icon: FaDocker, name: "Docker", color: "text-blue-500" },
     { icon: FaGithub, name: "GitHub Actions", color: "text-foreground" },
+    { icon: FaShieldAlt, name: "DevSecOps", color: "text-green-500" },
     { icon: SiPrometheus, name: "Prometheus", color: "text-orange-400" },
     { icon: SiGrafana, name: "Grafana", color: "text-orange-300" },
     { icon: FaPython, name: "Python", color: "text-green-400" },
