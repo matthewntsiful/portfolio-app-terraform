@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { HiMenu, HiX } from "react-icons/hi";
+import { FaGithub, FaLinkedin, FaCertificate } from "react-icons/fa";
 import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "./ThemeToggle";
 
@@ -34,8 +35,8 @@ const Navigation = () => {
         </button>
         
         {/* Desktop Navigation */}
-        <div className="hidden md:flex items-center space-x-8">
-          <div className="flex space-x-6">
+        <div className="hidden md:flex items-center space-x-6">
+          <div className="flex space-x-4">
             {navItems.map((item) => (
               <button
                 key={item.href}
@@ -46,6 +47,38 @@ const Navigation = () => {
               </button>
             ))}
           </div>
+          
+          {/* Social Links */}
+          <div className="flex items-center space-x-3">
+            <a
+              href="https://github.com/matthewntsiful"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-foreground/70 hover:text-foreground transition-colors p-2 rounded-lg hover:bg-accent/10"
+              aria-label="GitHub"
+            >
+              <FaGithub className="text-lg" />
+            </a>
+            <a
+              href="https://www.linkedin.com/in/matthewntsiful"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-foreground/70 hover:text-foreground transition-colors p-2 rounded-lg hover:bg-accent/10"
+              aria-label="LinkedIn"
+            >
+              <FaLinkedin className="text-lg" />
+            </a>
+            <a
+              href="https://www.credly.com/users/matthewntsiful"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-foreground/70 hover:text-foreground transition-colors p-2 rounded-lg hover:bg-accent/10"
+              aria-label="Certifications"
+            >
+              <FaCertificate className="text-lg" />
+            </a>
+          </div>
+          
           <ThemeToggle />
         </div>
         
