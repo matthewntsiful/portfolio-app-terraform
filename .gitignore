@@ -43,6 +43,8 @@ terraform.rc
 # Ignore .terraform directory in all subdirectories
 **/.terraform/*
 
-# Ignore JSON files
-*.json
+# Ignore specific JSON files (but keep package.json)
+*.tfvars.json
 !*.tf.json
+!package.json
+!package-lock.json

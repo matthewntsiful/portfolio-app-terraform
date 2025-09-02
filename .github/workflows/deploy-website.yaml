@@ -157,12 +157,48 @@ jobs:
         echo "=== STARTING DEPLOYMENT ==="
         echo "Working directory: $(pwd)"
         echo "Build directory: $BUILD_DIR"
+        echo "S3 Bucket: $BUCKET_NAME"
+        
+        # Check if bucket name is set
+        if [ -z "$BUCKET_NAME" ]; then
+          echo "❌ ERROR: S3_BUCKET_NAME secret is not set"
+          echo "Please set the S3_BUCKET_NAME secret in your GitHub repository"
+          exit 1
+        fi
+        
+        # Test AWS credentials
+        echo "Testing AWS credentials..."
+        aws sts get-caller-identity || {
+          echo "❌ ERROR: AWS credentials not configured properly"
+          echo "Please check your AWS_ROLE_ARN secret and OIDC setup"
+          exit 1
+        }
+        
+        # Test S3 bucket access
+        echo "Testing S3 bucket access..."
+        aws s3 ls s3://$BUCKET_NAME/ || {
+          echo "❌ ERROR: Cannot access S3 bucket: $BUCKET_NAME"
+          echo "Please check bucket exists and permissions are correct"
+          exit 1
+        }
+        
         echo "Files to deploy:"
         ls -la $BUILD_DIR/
         echo ""
         
+        # Verify build directory exists
+        if [ ! -d "$BUILD_DIR" ]; then
+          echo "❌ ERROR: Build directory $BUILD_DIR does not exist"
+          echo "Available directories:"
+          ls -la
+          exit 1
+        fi
+        
         # Change to build directory
         cd $BUILD_DIR
+        echo "Changed to build directory: $(pwd)"
+        echo "Files in build directory:"
+        ls -la
         
         # Upload files directly to S3 bucket root
         echo "Syncing HTML files..."
