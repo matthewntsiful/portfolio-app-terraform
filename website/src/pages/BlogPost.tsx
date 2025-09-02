@@ -60,7 +60,19 @@ const BlogPost = () => {
             </p>
           </div>
           
-          <div className="prose prose-lg max-w-none prose-headings:text-foreground prose-p:text-muted-foreground prose-strong:text-foreground prose-ul:text-muted-foreground prose-ol:text-muted-foreground">
+          <div className="prose prose-lg prose-slate dark:prose-invert max-w-none 
+                         prose-headings:text-foreground prose-headings:font-bold
+                         prose-h1:text-4xl prose-h1:mb-6 prose-h1:mt-8
+                         prose-h2:text-2xl prose-h2:mb-4 prose-h2:mt-8 prose-h2:border-b prose-h2:border-border prose-h2:pb-2
+                         prose-h3:text-xl prose-h3:mb-3 prose-h3:mt-6
+                         prose-p:text-muted-foreground prose-p:leading-7 prose-p:mb-4
+                         prose-strong:text-foreground prose-strong:font-semibold
+                         prose-ul:text-muted-foreground prose-ul:mb-4 prose-ul:pl-6
+                         prose-ol:text-muted-foreground prose-ol:mb-4 prose-ol:pl-6
+                         prose-li:mb-2 prose-li:leading-6
+                         prose-code:bg-muted prose-code:px-2 prose-code:py-1 prose-code:rounded prose-code:text-sm
+                         prose-pre:bg-muted prose-pre:p-4 prose-pre:rounded-lg prose-pre:overflow-x-auto
+                         prose-blockquote:border-l-4 prose-blockquote:border-primary prose-blockquote:pl-4 prose-blockquote:italic">
             <ReactMarkdown>{post.content}</ReactMarkdown>
           </div>
           
