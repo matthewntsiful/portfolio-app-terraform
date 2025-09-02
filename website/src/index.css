@@ -5,7 +5,42 @@
 /* Modern Portfolio Design System */
 @layer base {
   :root {
-    /* Base colors */
+    /* Light theme colors */
+    --background: 0 0% 100%;
+    --foreground: 222.2 84% 4.9%;
+    --card: 0 0% 100%;
+    --card-foreground: 222.2 84% 4.9%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 222.2 84% 4.9%;
+    
+    /* Electric theme colors */
+    --electric-blue: 203 100% 47%;
+    --electric-green: 179 100% 44%;
+    --electric-purple: 277 100% 48%;
+    
+    /* Semantic colors for light theme */
+    --primary: 203 100% 47%;
+    --primary-foreground: 210 40% 98%;
+    --secondary: 210 40% 96%;
+    --secondary-foreground: 222.2 84% 4.9%;
+    --muted: 210 40% 96%;
+    --muted-foreground: 215.4 16.3% 46.9%;
+    --accent: 179 100% 44%;
+    --accent-foreground: 222.2 84% 4.9%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 214.3 31.8% 91.4%;
+    --input: 214.3 31.8% 91.4%;
+    --ring: 203 100% 47%;
+    --radius: 0.5rem;
+    
+    /* Light theme gradients */
+    --hero-bg: linear-gradient(125deg, hsl(210 40% 98%) 0%, hsl(220 14% 96%) 50%, hsl(214 32% 91%) 100%);
+    --gradient-glass: linear-gradient(135deg, rgba(255,255,255,0.8), rgba(255,255,255,0.4));
+  }
+  
+  .dark {
+    /* Dark theme colors */
     --background: 220 13% 9%;
     --foreground: 210 40% 98%;
     --card: 220 13% 9%;
@@ -18,7 +53,7 @@
     --electric-green: 179 100% 44%;
     --electric-purple: 277 100% 48%;
     
-    /* Semantic colors using electric theme */
+    /* Semantic colors for dark theme */
     --primary: 203 100% 47%;
     --primary-foreground: 210 40% 98%;
     --secondary: 220 13% 18%;
@@ -32,10 +67,10 @@
     --border: 220 13% 18%;
     --input: 220 13% 18%;
     --ring: 203 100% 47%;
-    --radius: 0.5rem;
     
-    /* Hero gradient background */
+    /* Dark theme gradients */
     --hero-bg: linear-gradient(125deg, hsl(230 35% 7%) 0%, hsl(240 27% 13%) 50%, hsl(221 39% 17%) 100%);
+    --gradient-glass: linear-gradient(135deg, rgba(255,255,255,0.1), rgba(255,255,255,0.05));
     
     /* Glowing effects */
     --glow-blue: 0 0 40px hsl(var(--electric-blue) / 0.3);
@@ -66,7 +101,6 @@
     --gradient-card-5: linear-gradient(135deg, hsl(142 76% 50%), hsl(214 100% 59%));
     --gradient-card-6: linear-gradient(135deg, hsl(277 85% 60%), hsl(328 85% 65%));
   }
-}
 
 @layer base {
   * {

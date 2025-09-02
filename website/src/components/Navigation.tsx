@@ -34,20 +34,18 @@ const Navigation = () => {
         </button>
         
         {/* Desktop Navigation */}
-        <div className="hidden md:flex space-x-10 lg:space-x-12">
-          {navItems.map((item) => (
-            <button
-              key={item.href}
-              onClick={() => scrollToSection(item.href)}
-              className="relative text-white/80 hover:text-white transition-all duration-300 font-medium px-4 py-2 rounded-lg hover:bg-white/10 backdrop-blur-sm"
-            >
-              {item.label}
-            </button>
-          ))}
-        </div>
-        
-        {/* Theme Toggle */}
-        <div className="hidden md:flex items-center mr-4">
+        <div className="hidden md:flex items-center space-x-8">
+          <div className="flex space-x-6">
+            {navItems.map((item) => (
+              <button
+                key={item.href}
+                onClick={() => scrollToSection(item.href)}
+                className="relative text-white/80 hover:text-white transition-all duration-300 font-medium px-3 py-2 rounded-lg hover:bg-white/10 backdrop-blur-sm"
+              >
+                {item.label}
+              </button>
+            ))}
+          </div>
           <ThemeToggle />
         </div>
         
