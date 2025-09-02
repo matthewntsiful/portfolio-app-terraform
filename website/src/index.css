@@ -101,6 +101,7 @@
     --gradient-card-5: linear-gradient(135deg, hsl(142 76% 50%), hsl(214 100% 59%));
     --gradient-card-6: linear-gradient(135deg, hsl(277 85% 60%), hsl(328 85% 65%));
   }
+}
 
 @layer base {
   * {
