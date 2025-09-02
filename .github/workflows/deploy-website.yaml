@@ -56,10 +56,29 @@ jobs:
         sudo ./aws/install --update
         aws --version
 
+    - name: Debug AWS Configuration
+      run: |
+        echo "AWS Region: $AWS_REGION"
+        echo "AWS Identity:"
+        aws sts get-caller-identity
+        echo "S3 Bucket: ${{ secrets.S3_BUCKET_NAME }}"
+        echo "Testing S3 access:"
+        aws s3 ls s3://${{ secrets.S3_BUCKET_NAME }}/ || echo "S3 access failed"
+
     - name: Setup Node.js
       uses: actions/setup-node@v4
       with:
         node-version: '18'
+
+    - name: Debug Repository Structure
+      run: |
+        echo "=== Repository Structure Debug ==="
+        echo "Current directory: $(pwd)"
+        echo "Root contents:"
+        ls -la
+        echo "Looking for website directory:"
+        find . -name "package.json" -type f
+        echo "=== End Debug ==="
 
     - name: Install Dependencies
       working-directory: website
