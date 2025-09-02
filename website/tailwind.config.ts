@@ -116,6 +116,11 @@ export default {
 				'accordion-up': 'accordion-up 0.2s ease-out',
 				'float': 'float 3s ease-in-out infinite',
 				'glow': 'glow 2s ease-in-out infinite'
+			},
+			animationDelay: {
+				'150': '150ms',
+				'300': '300ms',
+				'450': '450ms'
 			}
 		}
 	},
