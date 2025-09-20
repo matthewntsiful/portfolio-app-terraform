@@ -34,7 +34,13 @@ const BlogSection = () => {
                     : "opacity-0 translate-y-8"
                 }`}
               >
-                <div className={`h-48 ${post.gradient}`}></div>
+                <div className="h-48 relative overflow-hidden">
+                  <img 
+                    src={post.image} 
+                    alt={post.title}
+                    className="w-full h-full object-cover hover:scale-110 transition-transform duration-500"
+                  />
+                </div>
                 <div className="p-6">
                   <span className="text-accent text-sm">{post.date}</span>
                   <h3 className="text-xl font-semibold my-2 text-card-foreground">

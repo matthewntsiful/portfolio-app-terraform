@@ -7,6 +7,7 @@ export interface BlogPost {
   tags: string[];
   gradient: string;
   readTime: string;
+  image: string;
 }
 
 export const blogPosts: BlogPost[] = [
@@ -46,7 +47,8 @@ Cost optimization is an ongoing process. Start with the biggest wins and continu
     date: "December 15, 2024",
     tags: ["AWS", "Cost Optimization", "DevOps", "Cloud"],
     gradient: "bg-gradient-card-4",
-    readTime: "5 min read"
+    readTime: "5 min read",
+    image: "/blog-aws-cost.svg"
   },
   {
     id: "secure-cicd-pipelines",
@@ -88,7 +90,8 @@ Security is everyone's responsibility, but DevOps engineers are uniquely positio
     date: "November 28, 2024",
     tags: ["DevSecOps", "CI/CD", "Security", "GitHub Actions"],
     gradient: "bg-gradient-card-5",
-    readTime: "7 min read"
+    readTime: "7 min read",
+    image: "/blog-cicd-security.svg"
   },
   {
     id: "kubernetes-disaster-recovery",
@@ -132,6 +135,7 @@ The key is preparation, automation, and regular testing. Your DR plan is only as
     date: "October 10, 2024",
     tags: ["Kubernetes", "Disaster Recovery", "DevOps", "High Availability"],
     gradient: "bg-gradient-card-6",
-    readTime: "8 min read"
+    readTime: "8 min read",
+    image: "/blog-k8s-dr.svg"
   }
 ];

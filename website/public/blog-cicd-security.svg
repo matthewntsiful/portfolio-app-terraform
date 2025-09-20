@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 200" width="400" height="200">
+  <defs>
+    <linearGradient id="secGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#0099FF;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#00CC88;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  <rect width="400" height="200" fill="url(#secGrad)"/>
+  <text x="200" y="80" font-family="Arial, sans-serif" font-size="20" font-weight="bold" text-anchor="middle" fill="white">Secure CI/CD</text>
+  <text x="200" y="110" font-family="Arial, sans-serif" font-size="16" text-anchor="middle" fill="white">Pipelines</text>
+  <rect x="80" y="130" width="40" height="20" rx="4" fill="white" opacity="0.8"/>
+  <rect x="140" y="130" width="40" height="20" rx="4" fill="white" opacity="0.8"/>
+  <rect x="200" y="130" width="40" height="20" rx="4" fill="white" opacity="0.8"/>
+  <rect x="260" y="130" width="40" height="20" rx="4" fill="white" opacity="0.8"/>
+  <path d="M120 140 L140 140 M180 140 L200 140 M240 140 L260 140" stroke="white" stroke-width="2" opacity="0.9"/>
+  <circle cx="320" cy="140" r="4" fill="white"/>
+</svg>
