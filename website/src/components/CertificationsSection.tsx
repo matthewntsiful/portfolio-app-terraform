@@ -1,5 +1,6 @@
 import { useInView } from "react-intersection-observer";
-import { FaAws, FaGraduationCap, FaRocket, FaCertificate } from "react-icons/fa";
+import { FaAws, FaGraduationCap, FaRocket, FaCertificate, FaLinux } from "react-icons/fa";
+import { SiKubernetes } from "react-icons/si";
 
 const CertificationsSection = () => {
   const { ref, inView } = useInView({
@@ -25,6 +26,24 @@ const CertificationsSection = () => {
       title: "AWS Solutions Architect Associate",
       description: "In progress - Deepening AWS architecture expertise",
       iconColor: "text-purple-500",
+    },
+    {
+      icon: FaLinux,
+      title: "LFS162: Introduction to DevOps and Site Reliability Engineering",
+      description: "Linux Foundation - DevOps and SRE fundamentals",
+      iconColor: "text-electric-green",
+    },
+    {
+      icon: SiKubernetes,
+      title: "LFS158: Introduction to Kubernetes",
+      description: "Linux Foundation - Container orchestration with Kubernetes",
+      iconColor: "text-electric-blue",
+    },
+    {
+      icon: FaLinux,
+      title: "LFS101: Introduction to Linux",
+      description: "Linux Foundation - Linux system administration fundamentals",
+      iconColor: "text-electric-purple",
     },
   ];
 
