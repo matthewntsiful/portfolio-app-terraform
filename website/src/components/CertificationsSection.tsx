@@ -29,20 +29,20 @@ const CertificationsSection = () => {
     },
     {
       icon: FaLinux,
-      title: "LFS162: Introduction to DevOps and Site Reliability Engineering",
-      description: "Linux Foundation - DevOps and SRE fundamentals",
+      title: "DevOps and Site Reliability Engineering",
+      description: "Linux Foundation LFS162 - DevOps practices and SRE methodologies",
       iconColor: "text-electric-green",
     },
     {
       icon: SiKubernetes,
-      title: "LFS158: Introduction to Kubernetes",
-      description: "Linux Foundation - Container orchestration with Kubernetes",
+      title: "Kubernetes Container Orchestration",
+      description: "Linux Foundation LFS158 - Production-ready Kubernetes deployment",
       iconColor: "text-electric-blue",
     },
     {
       icon: FaLinux,
-      title: "LFS101: Introduction to Linux",
-      description: "Linux Foundation - Linux system administration fundamentals",
+      title: "Linux System Administration",
+      description: "Linux Foundation LFS101 - Enterprise Linux operations",
       iconColor: "text-electric-purple",
     },
   ];
